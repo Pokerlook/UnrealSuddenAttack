@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+
 //#include "SATagSingleton.generated.h"
 
 struct FSAGameplayTags
@@ -15,15 +16,16 @@ public:
 	/*
 		InputTags
 	*/
-	FGameplayTag InputTag_Move;
+	FGameplayTag InputTag_Move;		// wsad
 	FGameplayTag InputTag_Look;
-	FGameplayTag InputTag_Jump;
+	FGameplayTag InputTag_Jump;		// space
 	FGameplayTag InputTag_Crouch;	// c
 	FGameplayTag InputTag_Prone;	// z
 	FGameplayTag InputTag_Sneek;	// left ctrl
 	FGameplayTag InputTag_Sprint;	// left shift
-	FGameplayTag InputTag_Fire;
-	FGameplayTag InputTag_Aim;
+	FGameplayTag InputTag_Fire;		// lmb
+	FGameplayTag InputTag_Aim;		// rmb
+	FGameplayTag InputTag_Wheel;
 	FGameplayTag InputTag_Reload;	// r
 	FGameplayTag InputTag_HolsterWeapon;	// x
 	FGameplayTag InputTag_Weapon1;
@@ -36,13 +38,17 @@ public:
 	FGameplayTag InputTag_Interact;		// f
 	FGameplayTag InputTag_ShootMode;	//b
 	FGameplayTag InputTag_ViewMode;	// v
+	FGameplayTag InputTag_DropWeapon; // G
+	FGameplayTag InputTag_Vault;	// h
+	FGameplayTag InputTag_FreeLook;	// left alt
 
 
-//	FGameplayTag InputTag_Inventory;	// I
-//	FGameplayTag InputTag_Map;	// m
+	FGameplayTag InputTag_Inventory;	// I
+	FGameplayTag InputTag_Map;	// m
 	FGameplayTag InputTag_MiniMap;	// n
 	FGameplayTag InputTag_ESC;
-	FGameplayTag InputTag_Leaderboard;
+	FGameplayTag InputTag_Leaderboard;	// tab
+	FGameplayTag InputTag_WeaponMenu;	// p
 
 private:
 	static FSAGameplayTags GameplayTags;

@@ -3,3 +3,36 @@
 
 #include "SA/Character/SAPlayableCharacter.h"
 
+ASAPlayableCharacter::ASAPlayableCharacter()
+{
+
+}
+
+void ASAPlayableCharacter::Move(FVector2D Value)
+{
+	if (Controller != nullptr)
+	{
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// get forward vector
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		// get right vector 
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		// add movement 
+		AddMovementInput(ForwardDirection, Value.Y);
+		AddMovementInput(RightDirection, Value.X);
+	}
+}
+
+void ASAPlayableCharacter::Look(FVector2D Value)
+{
+	if (APlayerController* PC = Cast<APlayerController>(Controller))
+	{		
+		PC->AddYawInput(Value.X);
+		PC->AddPitchInput(Value.Y);
+	}
+}

@@ -4,14 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "SA/Character/SACharacterBase.h"
+#include "SA/Interface/CommandInterface.h"
 #include "SAPlayableCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SA_API ASAPlayableCharacter : public ASACharacterBase
+class SA_API ASAPlayableCharacter : public ASACharacterBase, public ICommandInterface
 {
 	GENERATED_BODY()
-	
+public:
+	ASAPlayableCharacter();
+
+	// Command Interface
+	virtual void Move(FVector2D Value) override;
+	virtual void Look(FVector2D Value) override;
+
+
+protected:
+
+private:
+
 };

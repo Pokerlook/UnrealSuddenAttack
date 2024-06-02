@@ -13,5 +13,9 @@ UCLASS()
 class SA_API USAAssetManager : public UAssetManager
 {
 	GENERATED_BODY()
-	
+public:
+	static USAAssetManager& Get();
+protected:
+
+	virtual void StartInitialLoading() override;
 };
