@@ -74,3 +74,6 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 .vscode/
+
+# Non-Free Assets will contain
+content/Assets
