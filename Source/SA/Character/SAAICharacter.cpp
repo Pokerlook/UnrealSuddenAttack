@@ -10,5 +10,14 @@ ASAAICharacter::ASAAICharacter()
 	AbilitySystemComponent = CreateDefaultSubobject<USAAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 
+	// GE makes Attribute change, for AI, I just want to know alive or not
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
+
 	AttributeSet = CreateDefaultSubobject<USAAttributeSet>("AttributeSet");
+}
+
+void ASAAICharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }

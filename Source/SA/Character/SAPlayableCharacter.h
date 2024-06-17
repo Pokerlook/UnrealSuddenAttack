@@ -20,10 +20,14 @@ public:
 	// Command Interface
 	virtual void Move(FVector2D Value) override;
 	virtual void Look(FVector2D Value) override;
+	// command
 
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
 
 protected:
 
 private:
+	void InitAbilityActorInfo();
 
 };

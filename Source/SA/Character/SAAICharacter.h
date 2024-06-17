@@ -15,5 +15,7 @@ class SA_API ASAAICharacter : public ASACharacterBase
 	GENERATED_BODY()
 public:
 	ASAAICharacter();
-	
+
+protected:
+	virtual void BeginPlay() override;
 };

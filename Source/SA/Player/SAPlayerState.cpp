@@ -10,7 +10,8 @@ ASAPlayerState::ASAPlayerState()
 	NetUpdateFrequency = 100.f;
 
 	AbilitySystemComponent = CreateDefaultSubobject<USAAbilitySystemComponent>("AbilitySystemComponent");
-	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetIsReplicated(true); 
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);	// Player HUD needs Attribute info
 
 	AttributeSet = CreateDefaultSubobject<USAAttributeSet>("AttributeSet");
 

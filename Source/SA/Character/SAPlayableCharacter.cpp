@@ -2,6 +2,8 @@
 
 
 #include "SA/Character/SAPlayableCharacter.h"
+#include "SA/Player/SAPlayerState.h"
+#include "AbilitySystemComponent.h"
 
 ASAPlayableCharacter::ASAPlayableCharacter()
 {
@@ -35,4 +37,28 @@ void ASAPlayableCharacter::Look(FVector2D Value)
 		PC->AddYawInput(Value.X);
 		PC->AddPitchInput(Value.Y);
 	}
+}
+
+void ASAPlayableCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Init ability actor info for the Server
+	InitAbilityActorInfo();
+}
+
+void ASAPlayableCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// Init ability actor info for the Client
+	InitAbilityActorInfo();
+}
+
+void ASAPlayableCharacter::InitAbilityActorInfo()
+{
+	ASAPlayerState* PS = GetPlayerStateChecked<ASAPlayerState>();
+	PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
+	AbilitySystemComponent = PS->GetAbilitySystemComponent();
+	AttributeSet = PS->GetAttributeSet();
 }
