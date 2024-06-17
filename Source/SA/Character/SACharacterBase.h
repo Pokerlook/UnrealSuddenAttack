@@ -3,11 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "SACharacterBase.generated.h"
 
+class UAbilitySystemComponent;
+class UAttributeSet;
+
 UCLASS()
-class SA_API ASACharacterBase : public ACharacter
+class SA_API ASACharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -19,12 +23,19 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+		TObjectPtr<UAttributeSet> AttributeSet;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 private:
 

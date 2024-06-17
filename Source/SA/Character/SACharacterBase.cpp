@@ -2,6 +2,8 @@
 
 
 #include "SA/Character/SACharacterBase.h"
+#include "SA/AbilitySystem/SAAbilitySystemComponent.h"
+#include "SA/AbilitySystem/SAAttributeSet.h"
 
 // Sets default values
 ASACharacterBase::ASACharacterBase()
@@ -30,5 +32,10 @@ void ASACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+UAbilitySystemComponent* ASACharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
 }
 

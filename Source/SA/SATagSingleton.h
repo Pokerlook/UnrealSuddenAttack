@@ -49,6 +49,18 @@ public:
 	FGameplayTag InputTag_ESC;
 	FGameplayTag InputTag_Leaderboard;	// tab
 	FGameplayTag InputTag_WeaponMenu;	// p
+	/*
+		InputTags
+	*/
+
+
+	/*
+		LocomotionTags
+	*/
+	FGameplayTag ActionTag_;
+	/*
+		LocomotionTags
+	*/
 
 private:
 	static FSAGameplayTags GameplayTags;
