@@ -4,12 +4,16 @@
 #include "SA/Character/SACharacterBase.h"
 #include "SA/AbilitySystem/SAAbilitySystemComponent.h"
 #include "SA/AbilitySystem/SAAttributeSet.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ASACharacterBase::ASACharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	bUseControllerRotationYaw = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 }
 

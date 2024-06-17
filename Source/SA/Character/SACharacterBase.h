@@ -5,19 +5,27 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "SA/Interface/AnimInterface.h"
 #include "SACharacterBase.generated.h"
 
 class UAbilitySystemComponent;
 class UAttributeSet;
 
 UCLASS()
-class SA_API ASACharacterBase : public ACharacter, public IAbilitySystemInterface
+class SA_API ASACharacterBase : public ACharacter, public IAbilitySystemInterface, public IAnimInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	ASACharacterBase();
+
+	// Anim Interface
+	virtual float GetSpeed() const override;
+
+	virtual bool IsInAir() const override;
+	virtual bool IsAccelerating() const override;
+	// Anim Interface
 
 protected:
 	// Called when the game starts or when spawned

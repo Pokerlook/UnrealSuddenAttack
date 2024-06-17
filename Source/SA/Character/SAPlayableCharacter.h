@@ -27,7 +27,13 @@ public:
 
 protected:
 
-private:
+private:	
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	class UCameraComponent* FollowCamera;
+
 	void InitAbilityActorInfo();
 
 };
