@@ -57,7 +57,7 @@ public:
 	/*
 		LocomotionTags
 	*/
-	FGameplayTag ActionTag_;
+	FGameplayTag LocoTag_;
 	/*
 		LocomotionTags
 	*/

@@ -6,9 +6,19 @@
 #include "AbilitySystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ASAPlayableCharacter::ASAPlayableCharacter()
 {
+	// Configure character movement	
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
 	CameraBoom->TargetArmLength = 600.f;
@@ -41,11 +51,13 @@ void ASAPlayableCharacter::Move(FVector2D Value)
 
 void ASAPlayableCharacter::Look(FVector2D Value)
 {
-	if (APlayerController* PC = Cast<APlayerController>(Controller))
-	{		
-		PC->AddYawInput(Value.X);
-		PC->AddPitchInput(Value.Y);
-	}
+	//if (APlayerController* PC = Cast<APlayerController>(Controller))
+	//{		
+	//	PC->AddYawInput(Value.X);
+	//	PC->AddPitchInput(Value.Y);
+	//}
+	AddControllerYawInput(Value.X); 
+	AddControllerPitchInput(-Value.Y);
 }
 
 void ASAPlayableCharacter::PossessedBy(AController* NewController)
