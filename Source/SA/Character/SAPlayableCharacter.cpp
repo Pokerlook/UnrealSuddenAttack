@@ -8,7 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-ASAPlayableCharacter::ASAPlayableCharacter()
+ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
 {
 	// Configure character movement	
 	bUseControllerRotationPitch = false;

@@ -15,7 +15,7 @@ class SA_API ASAPlayableCharacter : public ASACharacterBase, public ICommandInte
 {
 	GENERATED_BODY()
 public:
-	ASAPlayableCharacter();
+	ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer);
 
 	// Command Interface
 	virtual void Move(FVector2D Value) override;

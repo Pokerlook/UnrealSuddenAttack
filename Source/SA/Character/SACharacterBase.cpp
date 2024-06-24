@@ -4,11 +4,13 @@
 #include "SA/Character/SACharacterBase.h"
 #include "SA/AbilitySystem/SAAbilitySystemComponent.h"
 #include "SA/AbilitySystem/SAAttributeSet.h"
+#include "SA/Component/SACharacterMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-ASACharacterBase::ASACharacterBase()
+ASACharacterBase::ASACharacterBase(const FObjectInitializer& ObjectInitializer)
+    :Super(ObjectInitializer.SetDefaultSubobjectClass<USACharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -79,9 +81,20 @@ bool ASACharacterBase::IsAccelerating() const
 	return false;
 }
 
+bool ASACharacterBase::IsAiming() const
+{
+    // 나중엔 Aiming 관련 태그 체크 할 거임
+    return bIsAiming;
+}
+
 ECharacterStance ASACharacterBase::GetStance() const
 {
     return CharacterStance;
+}
+
+EWeaponType ASACharacterBase::GetEquippedWeaponType() const
+{
+    return EquippedWeaponType;
 }
 
 // Called when the game starts or when spawned

@@ -5,7 +5,8 @@
 #include "SA/AbilitySystem/SAAbilitySystemComponent.h"
 #include "SA/AbilitySystem/SAAttributeSet.h"
 
-ASAAICharacter::ASAAICharacter()
+ASAAICharacter::ASAAICharacter(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
 {
 	AbilitySystemComponent = CreateDefaultSubobject<USAAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);

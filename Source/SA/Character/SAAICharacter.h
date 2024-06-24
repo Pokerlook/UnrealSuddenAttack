@@ -14,7 +14,7 @@ class SA_API ASAAICharacter : public ASACharacterBase
 {
 	GENERATED_BODY()
 public:
-	ASAAICharacter();
+	ASAAICharacter(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void BeginPlay() override;

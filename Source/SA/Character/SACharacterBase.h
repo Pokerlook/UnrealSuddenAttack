@@ -18,7 +18,7 @@ class SA_API ASACharacterBase : public ACharacter, public IAbilitySystemInterfac
 
 public:
 	// Sets default values for this character's properties
-	ASACharacterBase();
+	ASACharacterBase(const FObjectInitializer& ObjectInitializer);
 
 	// Anim variable
 
@@ -33,8 +33,10 @@ public:
 
 	virtual bool IsInAir() const override;
 	virtual bool IsAccelerating() const override;
+	virtual bool IsAiming() const override;
 
 	virtual ECharacterStance GetStance() const override;
+	virtual EWeaponType GetEquippedWeaponType() const override;
 	// Anim Interface
 
 protected:
@@ -62,4 +64,11 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 bp에 노출 안할 거
 	ECharacterStance CharacterStance = ECharacterStance::Stand;
+
+	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 bp에 노출 안할 거
+	EWeaponType EquippedWeaponType = EWeaponType::None;	 // 나중에 무기 변수로 바꿀 것, 무기타입은 무기->GetType할 것.
+
+	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 지울 변수
+		bool bIsAiming = false;
+
 };
