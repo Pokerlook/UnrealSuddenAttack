@@ -50,6 +50,8 @@ protected:
 		TObjectPtr<UAttributeSet> AttributeSet;
 
 	void AddCharacterAbilities();
+
+	void AimOffset(float DeltaTime);
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
@@ -61,6 +63,11 @@ private:
 	float Lean;
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
+
+
+	float Yaw;
+	float Pitch;
+	FRotator StartingAimRotation;
 
 	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 bp에 노출 안할 거
 	ECharacterStance CharacterStance = ECharacterStance::Stand;

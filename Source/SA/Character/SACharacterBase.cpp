@@ -52,20 +52,21 @@ float ASACharacterBase::GetDirection() const
 
 float ASACharacterBase::GetYaw() const
 {
-    return UKismetMathLibrary::NormalizedDeltaRotator(GetControlRotation(), GetActorRotation()).Yaw;
+    //return UKismetMathLibrary::NormalizedDeltaRotator(GetControlRotation(), GetActorRotation()).Yaw;
+    return Yaw;
 }
 
 float ASACharacterBase::GetPitch() const
 {
-    float Pitch; 
-    Pitch = UKismetMathLibrary::NormalizedDeltaRotator(GetControlRotation(), GetActorRotation()).Pitch;
-    if (Pitch > 90.f && !IsLocallyControlled())
-    {
-        // map pitch from [270, 360) to [-90, 0)
-        FVector2D InRange(270.f, 360.f);
-        FVector2D OutRange(-90.f, 0.f);
-        Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, Pitch);
-    }
+    //float Pitch; 
+    //Pitch = UKismetMathLibrary::NormalizedDeltaRotator(GetControlRotation(), GetActorRotation()).Pitch;
+    //if (Pitch > 90.f && !IsLocallyControlled())
+    //{
+    //    // map pitch from [270, 360) to [-90, 0)
+    //    FVector2D InRange(270.f, 360.f);
+    //    FVector2D OutRange(-90.f, 0.f);
+    //    Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, Pitch);
+    //}
 	return Pitch;
 }
 
@@ -111,10 +112,46 @@ void ASACharacterBase::AddCharacterAbilities()
     SAASC->AddCharacterAbilities(StartupAbilities);
 }
 
+void ASACharacterBase::AimOffset(float DeltaTime)
+{
+    FVector Velocity = GetVelocity();
+    Velocity.Z = 0.f;
+    float Speed = Velocity.Size();
+    bool bIsInAir = GetCharacterMovement()->IsFalling();
+
+    if (Speed == 0.f && !bIsInAir) // standing still, not jumping
+    {
+        FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+        FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
+        Yaw = DeltaAimRotation.Yaw;
+
+        bUseControllerRotationYaw = false;
+    }
+    if (Speed > 0.f || bIsInAir) // running, or jumping
+    {
+        StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+        Yaw = 0.f;
+        bUseControllerRotationYaw = true;
+    }
+
+    Pitch = GetBaseAimRotation().Pitch;
+    if (Pitch > 90.f && !IsLocallyControlled())
+    {
+        // map pitch from [270, 360) to [-90, 0)
+        FVector2D InRange(270.f, 360.f);
+        FVector2D OutRange(-90.f, 0.f);
+        Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, Pitch);
+    }
+
+}
+
+
 // Called every frame
 void ASACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+    AimOffset(DeltaTime);
 
     CharacterRotationLastFrame = CharacterRotation;
     CharacterRotation = GetActorRotation();

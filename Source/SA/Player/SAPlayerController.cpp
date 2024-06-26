@@ -7,7 +7,14 @@
 #include "SA/Interface/CommandInterface.h"
 
 #include "EnhancedInputSubsystems.h"
+#include "Net/UnrealNetwork.h"
 
+void ASAPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASAPlayerController, CharacterCommand);
+}
 
 void ASAPlayerController::BeginPlay()
 {
@@ -23,14 +30,22 @@ void ASAPlayerController::BeginPlay()
 		Subsystem->AddMappingContext(InputContext, 0);
 	}
 
+
 }
 
 void ASAPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	CharacterCommand = aPawn;
+	if (HasAuthority())
+	{
+		// 서버에서만 실행
+		CharacterCommand = aPawn;
+	}
 
+	// 클라이언트와 서버에서 모두 실행
+	UE_LOG(LogTemp, Warning, TEXT("OnPossess called! CharacterCommand: %s"), CharacterCommand ? TEXT("Valid") : TEXT("Null"));
+	
 }
 
 void ASAPlayerController::SetupInputComponent()
@@ -83,8 +98,11 @@ void ASAPlayerController::SetupInputComponent()
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_FreeLook, ETriggerEvent::Started, this, &ASAPlayerController::FreeLook);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_FreeLook, ETriggerEvent::Completed, this, &ASAPlayerController::FreeLook);
 
+}
 
-
+void ASAPlayerController::OnRep_CharacterCommand() const
+{
+	UE_LOG(LogTemp, Warning, TEXT("CharacterCommand replicated! CharacterCommand: %s"), CharacterCommand ? TEXT("Valid") : TEXT("Null"));
 }
 
 void ASAPlayerController::Move(const FInputActionValue& Value)

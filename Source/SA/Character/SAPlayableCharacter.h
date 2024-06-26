@@ -40,4 +40,6 @@ private:
 	void AbilityStart(const FGameplayTag& InputTag);
 	void AbilityEnd(const FGameplayTag& InputTag);
 
+
+	float WalkSpeed = 600.f;
 };

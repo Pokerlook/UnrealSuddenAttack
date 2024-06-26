@@ -24,7 +24,8 @@ public:
 	/** The input config that maps Input Actions to Input Tags*/
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 		UInputConfig* InputConfig;
-	
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,8 +37,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 		TObjectPtr<UInputMappingContext> InputContext;
 
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterCommand)
 		TScriptInterface<ICommandInterface> CharacterCommand;
+	UFUNCTION()
+		void OnRep_CharacterCommand() const;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
