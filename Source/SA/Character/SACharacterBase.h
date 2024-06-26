@@ -20,11 +20,6 @@ public:
 	// Sets default values for this character's properties
 	ASACharacterBase(const FObjectInitializer& ObjectInitializer);
 
-	// Anim variable
-
-	// Anim variable
-
-
 	// Anim Interface
 	virtual float GetSpeed() const override;
 	virtual float GetDirection() const override;
@@ -39,6 +34,11 @@ public:
 	virtual EWeaponType GetEquippedWeaponType() const override;
 	// Anim Interface
 
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -48,16 +48,16 @@ protected:
 
 	UPROPERTY()
 		TObjectPtr<UAttributeSet> AttributeSet;
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
+	void AddCharacterAbilities();
 private:
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+		TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+
+	// Anim variable
+
 	float Lean;
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
@@ -70,5 +70,7 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 지울 변수
 		bool bIsAiming = false;
+
+	// Anim variable
 
 };

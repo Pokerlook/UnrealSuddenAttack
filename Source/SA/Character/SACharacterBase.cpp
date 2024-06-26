@@ -104,6 +104,13 @@ void ASACharacterBase::BeginPlay()
 	
 }
 
+void ASACharacterBase::AddCharacterAbilities()
+{
+    if (!HasAuthority()) return;
+    USAAbilitySystemComponent* SAASC = CastChecked<USAAbilitySystemComponent>(AbilitySystemComponent);
+    SAASC->AddCharacterAbilities(StartupAbilities);
+}
+
 // Called every frame
 void ASACharacterBase::Tick(float DeltaTime)
 {
@@ -120,12 +127,6 @@ void ASACharacterBase::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void ASACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
 
 UAbilitySystemComponent* ASACharacterBase::GetAbilitySystemComponent() const
 {

@@ -13,5 +13,8 @@ UCLASS()
 class SA_API USAAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+public:
+	USAAbilitySystemComponent();
+
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 };
