@@ -25,7 +25,9 @@ class SA_API ICommandInterface
 public:
 	// BlueprintImplementableEvent, BlueprintNativeEvent
 	UFUNCTION(BlueprintCallable, Category = "Command")
-		virtual void Move(FVector2D Value) = 0;
+		virtual void MoveCommand(FVector2D Value) = 0;
 	UFUNCTION(BlueprintCallable, Category = "Command")
-		virtual void Look(FVector2D Value) = 0;
+		virtual void LookCommand(FVector2D Value) = 0;
+
+	virtual void JumpCommand(bool Value) = 0;
 };

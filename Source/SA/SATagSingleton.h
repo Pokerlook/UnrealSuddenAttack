@@ -53,11 +53,18 @@ public:
 		InputTags
 	*/
 
+	/*
+		StateTags
+	*/
+	FGameplayTag State_InAir_Jumping;
+	/*
+		StateTags
+	*/
 
 	/*
 		LocomotionTags
 	*/
-	FGameplayTag LocoTag_;
+	FGameplayTag Ability_Locomotion_Jump;
 	/*
 		LocomotionTags
 	*/

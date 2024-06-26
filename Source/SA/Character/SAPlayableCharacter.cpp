@@ -3,10 +3,13 @@
 
 #include "SA/Character/SAPlayableCharacter.h"
 #include "SA/Player/SAPlayerState.h"
+#include "SA/SATagSingleton.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Abilities/GameplayAbilityTypes.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -30,7 +33,7 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 	FollowCamera->bUsePawnControlRotation = false;
 }
 
-void ASAPlayableCharacter::Move(FVector2D Value)
+void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 {
 	if (Controller != nullptr)
 	{
@@ -50,7 +53,7 @@ void ASAPlayableCharacter::Move(FVector2D Value)
 	}
 }
 
-void ASAPlayableCharacter::Look(FVector2D Value)
+void ASAPlayableCharacter::LookCommand(FVector2D Value)
 {
 	//if (APlayerController* PC = Cast<APlayerController>(Controller))
 	//{		
@@ -59,6 +62,20 @@ void ASAPlayableCharacter::Look(FVector2D Value)
 	//}
 	AddControllerYawInput(Value.X); 
 	AddControllerPitchInput(-Value.Y);
+}
+
+void ASAPlayableCharacter::JumpCommand(bool Value)
+{
+	if (Value)
+	{
+		const FGameplayTag JumpTag = FSAGameplayTags::Get().InputTag_Jump;
+		AbilityStart(JumpTag);
+		//UE_LOG(LogTemp, Warning, TEXT("JumpAbility TryActivateAbility"));
+	}
+	else
+	{
+		AbilityEnd(FSAGameplayTags::Get().InputTag_Jump);
+	}
 }
 
 void ASAPlayableCharacter::PossessedBy(AController* NewController)
@@ -78,10 +95,55 @@ void ASAPlayableCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+void ASAPlayableCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	if (!AbilitySystemComponent) return;
+
+	const FSAGameplayTags& GameplayTags = FSAGameplayTags::Get();
+	FGameplayTagContainer TagContainer; 
+	TagContainer.AddTag(GameplayTags.State_InAir_Jumping);
+
+	AbilitySystemComponent->RemoveActiveEffectsWithTags(TagContainer);
+
+}
+
 void ASAPlayableCharacter::InitAbilityActorInfo()
 {
 	ASAPlayerState* PS = GetPlayerStateChecked<ASAPlayerState>();
 	PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
 	AbilitySystemComponent = PS->GetAbilitySystemComponent();
 	AttributeSet = PS->GetAttributeSet();
+}
+
+void ASAPlayableCharacter::AbilityStart(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid()) return; 
+
+	for (FGameplayAbilitySpec& AbilitySpec : AbilitySystemComponent->GetActivatableAbilities())
+	{
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			AbilitySystemComponent->AbilitySpecInputPressed(AbilitySpec);
+			if (!AbilitySpec.IsActive())
+			{
+				AbilitySystemComponent->TryActivateAbility(AbilitySpec.Handle);
+			}
+		}
+	}
+
+}
+
+void ASAPlayableCharacter::AbilityEnd(const FGameplayTag& InputTag)
+{
+	if (!InputTag.IsValid()) return;
+
+	for (FGameplayAbilitySpec& AbilitySpec : AbilitySystemComponent->GetActivatableAbilities())
+	{
+		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))
+		{
+			AbilitySystemComponent->AbilitySpecInputReleased(AbilitySpec);
+		}
+	}
 }

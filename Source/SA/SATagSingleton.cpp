@@ -140,4 +140,20 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 	// Input
 
 
+	// State
+	GameplayTags.State_InAir_Jumping = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.InAir.Jumping"),
+		FString("State InAir with Jumping")
+	);
+	// State
+
+
+	// Ability Locomotion
+	GameplayTags.Ability_Locomotion_Jump = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Locomotion.Jump"),
+		FString("Jump Ability")
+	);
+	// Ability Locomotion
+
+
 }

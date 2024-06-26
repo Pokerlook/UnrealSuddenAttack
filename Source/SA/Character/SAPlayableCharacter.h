@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "SA/Character/SACharacterBase.h"
 #include "SA/Interface/CommandInterface.h"
+#include "GameplayTagContainer.h"
 #include "SAPlayableCharacter.generated.h"
 
 /**
@@ -18,13 +19,14 @@ public:
 	ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer);
 
 	// Command Interface
-	virtual void Move(FVector2D Value) override;
-	virtual void Look(FVector2D Value) override;
+	virtual void MoveCommand(FVector2D Value) override;
+	virtual void LookCommand(FVector2D Value) override;
+	virtual void JumpCommand(bool Value) override;
 	// command
 
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
-
+	virtual void Landed(const FHitResult& Hit) override;
 protected:
 
 private:	
@@ -35,5 +37,7 @@ private:
 	class UCameraComponent* FollowCamera;
 
 	void InitAbilityActorInfo();
+	void AbilityStart(const FGameplayTag& InputTag);
+	void AbilityEnd(const FGameplayTag& InputTag);
 
 };

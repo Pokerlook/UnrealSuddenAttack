@@ -2,6 +2,7 @@
 
 
 #include "SAAbilitySystemComponent.h"
+#include "SA/AbilitySystem/Ability/SAGameplayAbility.h"
 
 USAAbilitySystemComponent::USAAbilitySystemComponent()
 {
@@ -9,10 +10,13 @@ USAAbilitySystemComponent::USAAbilitySystemComponent()
 
 void USAAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
-	for (TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-		GiveAbility(AbilitySpec);
-		//GiveAbilityAndActivateOnce(AbilitySpec);
+		if (const USAGameplayAbility* SAAbility = Cast<USAGameplayAbility>(AbilitySpec.Ability))
+		{
+			AbilitySpec.DynamicAbilityTags.AddTag(SAAbility->StartupInputTag);
+			GiveAbility(AbilitySpec);
+		}
 	}
 }

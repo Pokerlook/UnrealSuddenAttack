@@ -3,9 +3,11 @@
 
 #include "SA/Player/SAPlayerController.h"
 #include "SA/Input/SAInputComponent.h"
-#include "EnhancedInputSubsystems.h"
 #include "SA/SATagSingleton.h"
 #include "SA/Interface/CommandInterface.h"
+
+#include "EnhancedInputSubsystems.h"
+
 
 void ASAPlayerController::BeginPlay()
 {
@@ -89,7 +91,7 @@ void ASAPlayerController::Move(const FInputActionValue& Value)
 {
 	if (!CharacterCommand) return;
 	FVector2D MoveVector = Value.Get<FVector2D>();
-	CharacterCommand->Move(MoveVector);
+	CharacterCommand->MoveCommand(MoveVector);
 
 }
 
@@ -97,7 +99,7 @@ void ASAPlayerController::Look(const FInputActionValue& Value)
 {
 	if (!CharacterCommand) return;
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
-	CharacterCommand->Look(LookAxisVector);
+	CharacterCommand->LookCommand(LookAxisVector);
 
 	//AddYawInput(LookAxisVector.X);
 	//AddPitchInput(LookAxisVector.Y);
@@ -107,7 +109,8 @@ void ASAPlayerController::Jump(const FInputActionValue& Value)
 {
 	if (!CharacterCommand) return;
 	bool bValue = Value.Get<bool>();
-	UE_LOG(LogTemp, Warning, TEXT("space Jump %d"), bValue);
+//	UE_LOG(LogTemp, Warning, TEXT("space Jump %d"), bValue);
+	CharacterCommand->JumpCommand(bValue);
 }
 
 void ASAPlayerController::Crouch(const FInputActionValue& Value)

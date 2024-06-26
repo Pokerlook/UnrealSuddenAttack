@@ -53,7 +53,7 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Abilities")
-		TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+		TArray < TSubclassOf < class UGameplayAbility >> StartupAbilities;
 
 
 	// Anim variable
