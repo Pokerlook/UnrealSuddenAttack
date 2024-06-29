@@ -7,6 +7,7 @@
 #include "SA/Component/SACharacterMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASACharacterBase::ASACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -15,7 +16,7 @@ ASACharacterBase::ASACharacterBase(const FObjectInitializer& ObjectInitializer)
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-
+    bReplicates = true;
 }
 
 float ASACharacterBase::GetSpeed() const
@@ -98,6 +99,13 @@ EWeaponType ASACharacterBase::GetEquippedWeaponType() const
     return EquippedWeaponType;
 }
 
+void ASACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(ASACharacterBase, Yaw);
+}
+
 // Called when the game starts or when spawned
 void ASACharacterBase::BeginPlay()
 {
@@ -123,14 +131,14 @@ void ASACharacterBase::AimOffset(float DeltaTime)
     {
         FRotator CurrentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
         FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
-        Yaw = DeltaAimRotation.Yaw;
+        SetYaw(DeltaAimRotation.Yaw);
 
         bUseControllerRotationYaw = false;
     }
     if (Speed > 0.f || bIsInAir) // running, or jumping
     {
         StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
-        Yaw = 0.f;
+        SetYaw(0.f);
         bUseControllerRotationYaw = true;
     }
 
@@ -143,6 +151,21 @@ void ASACharacterBase::AimOffset(float DeltaTime)
         Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, Pitch);
     }
 
+}
+
+void ASACharacterBase::ClientSetYaw_Implementation(float NewYaw)
+{
+    Yaw = NewYaw;
+}
+
+void ASACharacterBase::SetYaw(float NewYaw)
+{
+    if (HasAuthority())
+    {
+        Yaw = NewYaw;
+        // 서버에서 클라이언트로 RPC 호출하여 Yaw 값을 전달
+        ClientSetYaw(NewYaw);
+    }
 }
 
 

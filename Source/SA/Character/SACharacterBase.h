@@ -34,6 +34,8 @@ public:
 	virtual EWeaponType GetEquippedWeaponType() const override;
 	// Anim Interface
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -64,8 +66,13 @@ private:
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
 
-
+	UPROPERTY(Replicated)
 	float Yaw;
+	// 서버에서 클라이언트로 Yaw 값을 동기화하기 위한 RPC 함수 선언
+	UFUNCTION(Client, Reliable)
+		void ClientSetYaw(float NewYaw);
+	void SetYaw(float NewYaw);
+
 	float Pitch;
 	FRotator StartingAimRotation;
 

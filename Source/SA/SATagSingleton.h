@@ -53,6 +53,7 @@ public:
 		InputTags
 	*/
 
+
 	/*
 		StateTags
 	*/
@@ -61,12 +62,26 @@ public:
 		StateTags
 	*/
 
+
 	/*
 		LocomotionTags
 	*/
 	FGameplayTag Ability_Locomotion_Jump;
 	/*
 		LocomotionTags
+	*/
+
+
+	/*
+		ItemTags
+	*/
+	FGameplayTag Item_Weapon_Gun_;
+
+	FGameplayTag Item_Equipment_;
+
+	FGameplayTag Item_Fashion_;
+	/*
+		ItemTags
 	*/
 
 private:
