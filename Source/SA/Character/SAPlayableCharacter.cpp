@@ -25,8 +25,9 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
-	CameraBoom->TargetArmLength = 600.f;
+	CameraBoom->TargetArmLength = 150.f;	// if zoom, 75. zoom mode, change camera?
 	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->ProbeSize = 6.0f;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);

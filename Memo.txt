@@ -10,7 +10,7 @@
 # ABP, 추가할 것 : 칼 / 수류탄.. AimOffset, BlendSpace +Idle
 -> Locomotion 이랑 AimOffset 애님그래프 스테이트에 추가해야함.
 
-
+# 데이터 테이블을 사용하여 아이템 데이터를 관리하고, 게임플레이 태그를 사용하여 아이템을 식별
 
 
 

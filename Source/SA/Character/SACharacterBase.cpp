@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ASACharacterBase::ASACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -110,7 +111,20 @@ void ASACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 void ASACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+    // The camera collides with my skeletal mesh, but it penetrates the mesh and shows transparent areas.
+    if (IsLocallyControlled())
+    {
+        // Set the collision response to block the camera
+        GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
+        GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Block);
+    }
+    else
+    {
+        // Set the collision response to ignore the camera
+        GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+        GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+    }
 }
 
 void ASACharacterBase::AddCharacterAbilities()
