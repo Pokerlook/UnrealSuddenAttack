@@ -1,0 +1,18 @@
+
+언리얼 엔진 애니메이션 블루프린트에서 FullBody 몽타주 슬롯이면 Layered blend per bone을 안 쓰고 몽타주대로 캐릭터가 움직이면 좋겠고, UpperBody 몽타주 슬롯이면 하체 움직임은 로코모션 구현해 놓은걸 따라가게 하고 싶다...
+
+
+# 태그 추가시, SATagSingleton에 추가.
+
+# 기본 어빌리티 추가하면 BP_PlayableCharacter의 StartupAbilities 배열에 넣어줘야함.
++시작 시 default GE 추가하기.
+
+# ABP, 추가할 것 : 칼 / 수류탄.. AimOffset, BlendSpace +Idle
+-> Locomotion 이랑 AimOffset 애님그래프 스테이트에 추가해야함.
+
+
+
+
+
+
+
