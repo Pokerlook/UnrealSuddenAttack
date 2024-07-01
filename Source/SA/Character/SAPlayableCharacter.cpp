@@ -70,6 +70,8 @@ void ASAPlayableCharacter::JumpCommand(bool Value)
 {
 	if (Value)
 	{
+		// Later, should check crouch and prone, return to stand.
+		// if stand, normal jump
 		const FGameplayTag JumpTag = FSAGameplayTags::Get().InputTag_Jump;
 		AbilityStart(JumpTag);
 		//UE_LOG(LogTemp, Warning, TEXT("JumpAbility TryActivateAbility"));

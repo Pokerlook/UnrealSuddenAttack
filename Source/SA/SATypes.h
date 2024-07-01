@@ -27,9 +27,9 @@ enum class EWeaponType : uint8
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
 {
-	Initial UMETA(DisplayName = "Initial State"),
+	Initial UMETA(DisplayName = "Initial State"),	// 계속 존재
 	Equipped UMETA(DisplayName = "Equipped"),
-	Dropped UMETA(DisplayName = "Dropped"),
+	Dropped UMETA(DisplayName = "Dropped"),		// 일정 시간 후 사라짐
 
 	DefaultMAX UMETA(DisplayName = "DefaultMAX")
 };
@@ -40,17 +40,20 @@ struct FS_ItemStaticData
 	GENERATED_USTRUCT_BODY()
 
 public:
-	FS_ItemStaticData() : ItemName(), ItemExplanation(), Icon(), RefClass(), StackSize(1)
+	FS_ItemStaticData() : IdentifierTag(), Name(), ItemExplanation(), Icon(), RefClass(), StackSize(1)
 	{}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FGameplayTag ItemName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag IdentifierTag;	// 이걸로 데이터베이스에서 서치.
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FText Name;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		FText ItemExplanation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		UTexture2D* Icon;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		TSubclassOf<class ASAItemBase> RefClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

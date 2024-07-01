@@ -1,6 +1,8 @@
 
 언리얼 엔진 애니메이션 블루프린트에서 FullBody 몽타주 슬롯이면 Layered blend per bone을 안 쓰고 몽타주대로 캐릭터가 움직이면 좋겠고, UpperBody 몽타주 슬롯이면 하체 움직임은 로코모션 구현해 놓은걸 따라가게 하고 싶다...
 
+# Interface & Cast
+-> 자주 써야하면 Interface, 어쩌다 한 번(BeginPlay 등 특정 시점)이면 그냥 Cast.
 
 # 태그 추가시, SATagSingleton에 추가.
 
