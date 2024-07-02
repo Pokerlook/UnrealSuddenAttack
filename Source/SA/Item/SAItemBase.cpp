@@ -2,8 +2,9 @@
 
 
 #include "SAItemBase.h"
-#include "Components/WidgetComponent.h"
 #include "SA/UI/SAPickupWidget.h"
+#include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASAItemBase::ASAItemBase()
@@ -14,6 +15,8 @@ ASAItemBase::ASAItemBase()
 
 	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
 	PickupWidget->SetupAttachment(RootComponent);
+
+	ItemData.Name = NSLOCTEXT("Namespace", "Key", "DefaultItemName");
 }
 
 void ASAItemBase::ShowInteractWidget()
@@ -32,14 +35,31 @@ void ASAItemBase::HideInteractWidget()
 	}
 }
 
+void ASAItemBase::InteractStart()
+{
+	// Get Item, check get item event...
+}
+
+void ASAItemBase::InteractEnd()
+{
+	// Empty
+}
+
+void ASAItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASAItemBase, ItemState);
+}
+
 void ASAItemBase::OnCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ShowInteractWidget();	// Test. It will be at player controller's line trace.
+	// add to inventory's overlapping items array
 }
 
 void ASAItemBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	HideInteractWidget();
+	// remove from inventory's overlapping items array	
 }
 
 // Called when the game starts or when spawned
@@ -54,5 +74,19 @@ void ASAItemBase::BeginPlay()
 		{
 			Widget->ItemName = ItemData.Name;
 		}
+	}
+}
+
+void ASAItemBase::OnRep_ItemState()
+{
+	if (ItemState == EItemState::Dropped)
+	{
+		// Start the destruction timer when the item is dropped
+//		GetWorldTimerManager().SetTimer(DestructionTimerHandle, this, &AItemActor::HandleItemDestruction, DestructionDelay, false);
+	}
+	else
+	{
+		// Clear the destruction timer if the state changes to anything else
+//		GetWorldTimerManager().ClearTimer(DestructionTimerHandle);
 	}
 }

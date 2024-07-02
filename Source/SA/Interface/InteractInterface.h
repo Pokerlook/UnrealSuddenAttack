@@ -25,5 +25,7 @@ public:
 
 	virtual void ShowInteractWidget() = 0;
 	virtual void HideInteractWidget() = 0;
+	virtual void InteractStart() = 0;
+	virtual void InteractEnd() = 0;
 
 };

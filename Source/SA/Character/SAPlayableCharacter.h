@@ -27,6 +27,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void Landed(const FHitResult& Hit) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 
 private:	
@@ -40,6 +42,7 @@ private:
 	void AbilityStart(const FGameplayTag& InputTag);
 	void AbilityEnd(const FGameplayTag& InputTag);
 
+	UPROPERTY(EditAnywhere, Replicated)
+	class USAInventoryComponent* InventoryComponent;	// 인벤토리 인터페이스나 Getter가 필요할 수도
 
-	float WalkSpeed = 600.f;
 };

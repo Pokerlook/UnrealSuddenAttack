@@ -25,7 +25,5 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 		class USphereComponent* AreaSphere;
 
-	UPROPERTY(VisibleAnywhere)
-		EWeaponState WeaponState = EWeaponState::Initial;
 
 };

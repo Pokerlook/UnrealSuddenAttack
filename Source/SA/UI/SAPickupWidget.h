@@ -17,6 +17,6 @@ class SA_API USAPickupWidget : public UUserWidget
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = ItemInfo)
-		FText ItemName = NSLOCTEXT("Namespace", "Key", "DefaultName");
+		FText ItemName;
 
 };

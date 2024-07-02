@@ -25,11 +25,12 @@ enum class EWeaponType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EWeaponState : uint8
+enum class EItemState : uint8
 {
 	Initial UMETA(DisplayName = "Initial State"),	// 계속 존재
-	Equipped UMETA(DisplayName = "Equipped"),
-	Dropped UMETA(DisplayName = "Dropped"),		// 일정 시간 후 사라짐
+//	InInventory UMETA(DisplayName = "InInventory"),	// 인벤에 있음.  --> 인벤에 들어가면 Destroy
+	InUse UMETA(DisplayName = "InUse"),				// 사용중. 또는 장비중.
+	Dropped UMETA(DisplayName = "Dropped"),			// 일정 시간 후 사라짐
 
 	DefaultMAX UMETA(DisplayName = "DefaultMAX")
 };

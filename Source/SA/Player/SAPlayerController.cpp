@@ -44,8 +44,10 @@ void ASAPlayerController::OnPossess(APawn* aPawn)
 	}
 
 	// 클라이언트와 서버에서 모두 실행
-	UE_LOG(LogTemp, Warning, TEXT("OnPossess called! CharacterCommand: %s"), CharacterCommand ? TEXT("Valid") : TEXT("Null"));
+//	UE_LOG(LogTemp, Warning, TEXT("OnPossess called! CharacterCommand: %s"), CharacterCommand ? TEXT("Valid") : TEXT("Null"));
 	
+	// 나중에, 기본 무장 선택할 경우 캐릭터의 인벤토리에 기본무장 추가 해주기. 기본무장 클래스 변수 필요할 것.
+
 }
 
 void ASAPlayerController::SetupInputComponent()
@@ -69,7 +71,6 @@ void ASAPlayerController::SetupInputComponent()
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_Weapon3, ETriggerEvent::Started, this, &ASAPlayerController::ChangeWeaponTo3);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_Weapon4, ETriggerEvent::Started, this, &ASAPlayerController::ChangeWeaponTo4);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_Weapon5, ETriggerEvent::Started, this, &ASAPlayerController::ChangeWeaponTo5);
-	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_Interact, ETriggerEvent::Started, this, &ASAPlayerController::Interact);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_ShootMode, ETriggerEvent::Started, this, &ASAPlayerController::ShootMode);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_ViewMode, ETriggerEvent::Started, this, &ASAPlayerController::ViewMode);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_DropWeapon, ETriggerEvent::Started, this, &ASAPlayerController::DropWeapon);
@@ -97,6 +98,8 @@ void ASAPlayerController::SetupInputComponent()
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_LeanRight, ETriggerEvent::Completed, this, &ASAPlayerController::LeanRight);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_FreeLook, ETriggerEvent::Started, this, &ASAPlayerController::FreeLook);
 	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_FreeLook, ETriggerEvent::Completed, this, &ASAPlayerController::FreeLook);
+	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_Interact, ETriggerEvent::Started, this, &ASAPlayerController::Interact);
+	SAInputComp->BindActionByTag(InputConfig, GameplayTags.InputTag_Interact, ETriggerEvent::Completed, this, &ASAPlayerController::Interact);
 
 }
 
@@ -237,6 +240,7 @@ void ASAPlayerController::LeanRight(const FInputActionValue& Value)
 void ASAPlayerController::Interact(const FInputActionValue& Value)
 {
 	if (!CharacterCommand) return;
+	bool bValue = Value.Get<bool>();
 	UE_LOG(LogTemp, Warning, TEXT("F Interact"));
 }
 

@@ -17,8 +17,15 @@ public:
 	// Sets default values for this actor's properties
 	ASAItemBase();
 	
+	// interact intf
 	virtual void ShowInteractWidget() override;
 	virtual void HideInteractWidget() override;
+	virtual void InteractStart() override;
+	virtual void InteractEnd() override;
+	// interact intf
+
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(BlueprintCallable)
 		void OnCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -37,4 +44,17 @@ private:
 		class UWidgetComponent* PickupWidget;
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 		FS_ItemStaticData ItemData;
+
+	UPROPERTY(ReplicatedUsing = OnRep_ItemState)
+		EItemState ItemState = EItemState::Initial;
+
+	UFUNCTION()
+		void OnRep_ItemState();
+
+
+	//// Destruction timer handle
+	//FTimerHandle DestructionTimerHandle;
+	//// Destruction delay in seconds
+	//UPROPERTY(EditAnywhere, Category = "Item Destory Parameter")
+	//	float DestructionDelay = 10.0f; // Adjust as necessary
 };

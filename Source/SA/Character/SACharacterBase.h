@@ -61,7 +61,6 @@ private:
 
 
 	// Anim variable
-
 	float Lean;
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
@@ -84,7 +83,9 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 지울 변수
 		bool bIsAiming = false;
-
 	// Anim variable
+
+
+	// 패션 skeletalmesh 관련 필요. 
 
 };

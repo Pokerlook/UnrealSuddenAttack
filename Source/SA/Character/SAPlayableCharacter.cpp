@@ -4,12 +4,14 @@
 #include "SA/Character/SAPlayableCharacter.h"
 #include "SA/Player/SAPlayerState.h"
 #include "SA/SATagSingleton.h"
+#include "SA/Component/SAInventoryComponent.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -32,6 +34,9 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	InventoryComponent = CreateDefaultSubobject<USAInventoryComponent>(TEXT("Inventory"));
+	InventoryComponent->SetIsReplicated(true);
 }
 
 void ASAPlayableCharacter::MoveCommand(FVector2D Value)
@@ -111,6 +116,12 @@ void ASAPlayableCharacter::Landed(const FHitResult& Hit)
 
 	AbilitySystemComponent->RemoveActiveEffectsWithTags(TagContainer);
 
+}
+
+void ASAPlayableCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ASAPlayableCharacter, InventoryComponent);
 }
 
 void ASAPlayableCharacter::InitAbilityActorInfo()
