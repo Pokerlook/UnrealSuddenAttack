@@ -25,8 +25,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	class ASAWeaponBase* CurrentWeapon; // now weapon in hands
-	class ASAWeaponBase* NextWeapon; // next weapon to change
-	TArray<ASAWeaponBase> EquippingWeapons;
+//	class ASAWeaponBase* NextWeapon; // next weapon to change
+//	TArray<ASAWeaponBase> EquippingWeapons;
 	// equipment(Çï¸ä,Á¶³¢,¹è³¶?) ¹è¿­ º¯¼ö ³ªÁß¿¡ Ãß°¡ÇÒ µí
 		
 };

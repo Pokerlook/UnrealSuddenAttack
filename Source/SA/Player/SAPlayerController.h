@@ -10,6 +10,7 @@
 
 class UInputMappingContext;
 class ICommandInterface;
+class IInteractInterface;
 
 
 /**
@@ -25,6 +26,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 		UInputConfig* InputConfig;
 
+	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
@@ -34,6 +36,11 @@ protected:
 
 
 private:
+
+	TScriptInterface<IInteractInterface> ThisInteract;
+	TScriptInterface<IInteractInterface> LastInteract;
+
+
 	UPROPERTY(EditAnywhere, Category = "Input")
 		TObjectPtr<UInputMappingContext> InputContext;
 

@@ -28,29 +28,30 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(BlueprintCallable)
-		void OnCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION(BlueprintCallable)
-		void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		void OnCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
-	// 이름(태그), 설명, 아이템 클래스 는 Static Data 구조체 -> 런타임에 안 바뀜
-	// 그 외에는 상속받은 곳에서...
-private:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 		class UWidgetComponent* PickupWidget;
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 		FS_ItemStaticData ItemData;
+
+	// 이름(태그), 설명, 아이템 클래스 는 Static Data 구조체 -> 런타임에 안 바뀜
+	// 그 외에는 상속받은 곳에서...
+private:
+	USceneComponent* RootSceneComponent;
+
 
 	UPROPERTY(ReplicatedUsing = OnRep_ItemState)
 		EItemState ItemState = EItemState::Initial;
 
 	UFUNCTION()
 		void OnRep_ItemState();
-
 
 	//// Destruction timer handle
 	//FTimerHandle DestructionTimerHandle;

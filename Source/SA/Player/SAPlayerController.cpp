@@ -5,9 +5,49 @@
 #include "SA/Input/SAInputComponent.h"
 #include "SA/SATagSingleton.h"
 #include "SA/Interface/CommandInterface.h"
+#include "SA/Interface/InteractInterface.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "Net/UnrealNetwork.h"
+#include "Camera/CameraComponent.h"
+
+void ASAPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+
+	if (!IsLocalController()) return;
+	if (!IsValid(GetPawn())) return;
+	UCameraComponent* CameraComponent = GetPawn()->FindComponentByClass<UCameraComponent>();
+	if (!IsValid(CameraComponent)) return;
+
+	FVector Start = CameraComponent->GetComponentLocation();
+	FVector End = Start + CameraComponent->GetForwardVector() * 1000.0f;
+	FHitResult HitResult;
+
+	FCollisionQueryParams TraceParams(FName(TEXT("CommandTrace")), true, this);
+	TraceParams.bTraceComplex = true;
+	TraceParams.bReturnPhysicalMaterial = false;
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, TraceParams);
+	
+	// Draw debug line
+#if WITH_EDITOR
+	DrawDebugLine(GetWorld(), Start+ CameraComponent->GetForwardVector() * 100.0f, End, FColor::Green, false, 1, 0, 1);
+#endif
+
+	if (!bHit) return; // 이거 맞나? && !ThisInteract 추가해야하나?
+
+	LastInteract = ThisInteract;
+	ThisInteract = HitResult.GetActor();
+
+	if (LastInteract != ThisInteract)
+	{
+		if (LastInteract) LastInteract->HideInteractWidget();
+		if (ThisInteract) ThisInteract->ShowInteractWidget();
+	}
+
+}
 
 void ASAPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
