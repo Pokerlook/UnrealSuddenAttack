@@ -8,6 +8,8 @@
 #include "GameplayTagContainer.h"
 #include "SAPlayableCharacter.generated.h"
 
+class IInteractInterface;
+
 /**
  * 
  */
@@ -22,8 +24,10 @@ public:
 	virtual void MoveCommand(FVector2D Value) override;
 	virtual void LookCommand(FVector2D Value) override;
 	virtual void JumpCommand(bool Value) override;
+	virtual void InteractCommand(bool Value) override;
 	// command
 
+	virtual void Tick(float DeltaTime) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void Landed(const FHitResult& Hit) override;
@@ -32,6 +36,7 @@ public:
 protected:
 
 private:	
+
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* CameraBoom;
 
@@ -44,5 +49,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Replicated)
 	class USAInventoryComponent* InventoryComponent;	// 인벤토리 인터페이스나 Getter가 필요할 수도
+
+	TScriptInterface<IInteractInterface> ThisInteract;
+	TScriptInterface<IInteractInterface> LastInteract;
+	bool isInteracting = false;
+
+	void CheckInteractInterface();
 
 };

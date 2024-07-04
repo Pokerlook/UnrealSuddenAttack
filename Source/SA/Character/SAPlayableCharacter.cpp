@@ -5,6 +5,8 @@
 #include "SA/Player/SAPlayerState.h"
 #include "SA/SATagSingleton.h"
 #include "SA/Component/SAInventoryComponent.h"
+#include "SA/Interface/InteractInterface.h"
+
 #include "AbilitySystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -87,6 +89,28 @@ void ASAPlayableCharacter::JumpCommand(bool Value)
 	}
 }
 
+void ASAPlayableCharacter::InteractCommand(bool Value)
+{
+	if (Value == true && !ThisInteract) return;
+	if (Value == false)
+	{
+		ThisInteract->InteractEnd();
+		isInteracting = false;
+	}
+	if (Value == true)
+	{
+		ThisInteract->InteractStart();
+		isInteracting = true;
+	}
+}
+
+void ASAPlayableCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	CheckInteractInterface();
+}
+
 void ASAPlayableCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -160,5 +184,36 @@ void ASAPlayableCharacter::AbilityEnd(const FGameplayTag& InputTag)
 		{
 			AbilitySystemComponent->AbilitySpecInputReleased(AbilitySpec);
 		}
+	}
+}
+
+void ASAPlayableCharacter::CheckInteractInterface()
+{
+	if (!IsLocallyControlled()) return;
+
+	FVector Start = FollowCamera->GetComponentLocation();
+	FVector End = Start + FollowCamera->GetForwardVector() * 1000.0f;
+	FHitResult HitResult;
+
+	FCollisionQueryParams TraceParams(FName(TEXT("CommandTrace")), true, this);
+	TraceParams.bTraceComplex = true;
+	TraceParams.bReturnPhysicalMaterial = false;
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, TraceParams);
+
+	// Draw debug line
+#if WITH_EDITOR
+	DrawDebugLine(GetWorld(), Start + FollowCamera->GetForwardVector() * 100.0f, End, FColor::Green, false, 1, 0, 1);
+#endif
+
+	if (!bHit && !ThisInteract) return;
+	if (isInteracting) return;	// interact중이면 ThisInteract 가지고 있어야 하니 아래 코드 실행 안 함
+	LastInteract = ThisInteract;
+	ThisInteract = HitResult.GetActor();
+
+	if (LastInteract != ThisInteract)
+	{
+		if (LastInteract) LastInteract->HideInteractWidget();
+		if (ThisInteract) ThisInteract->ShowInteractWidget();
 	}
 }

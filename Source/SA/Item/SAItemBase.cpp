@@ -41,11 +41,13 @@ void ASAItemBase::HideInteractWidget()
 void ASAItemBase::InteractStart()
 {
 	// Get Item, check get item event...
+	UE_LOG(LogTemp, Warning, TEXT("ItemBase Interact start"));
 }
 
 void ASAItemBase::InteractEnd()
 {
 	// Empty
+	UE_LOG(LogTemp, Warning, TEXT("ItemBase Interact end"));
 }
 
 void ASAItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

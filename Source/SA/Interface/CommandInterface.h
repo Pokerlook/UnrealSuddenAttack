@@ -24,10 +24,10 @@ class SA_API ICommandInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	// BlueprintImplementableEvent, BlueprintNativeEvent
-	UFUNCTION(BlueprintCallable, Category = "Command")
-		virtual void MoveCommand(FVector2D Value) = 0;
-	UFUNCTION(BlueprintCallable, Category = "Command")
-		virtual void LookCommand(FVector2D Value) = 0;
+	virtual void MoveCommand(FVector2D Value) = 0;
+	virtual void LookCommand(FVector2D Value) = 0;
 
 	virtual void JumpCommand(bool Value) = 0;
+
+	virtual void InteractCommand(bool Value) = 0;
 };

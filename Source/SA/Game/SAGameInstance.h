@@ -13,5 +13,8 @@ UCLASS()
 class SA_API USAGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		UDataTable* ItemDT;
 };

@@ -156,4 +156,13 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 	// Ability Locomotion
 
 
+	// Item
+	GameplayTags.Item_Weapon_Gun_AssaultRifle = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Item_Weapon.Gun.AssaultRifle"),
+		FString("AssaultRilfe identifier tag")
+	);
+	// Item
+
+
+
 }

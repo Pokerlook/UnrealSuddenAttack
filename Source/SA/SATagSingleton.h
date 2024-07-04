@@ -76,6 +76,7 @@ public:
 		ItemTags
 	*/
 	FGameplayTag Item_Weapon_Gun_;
+	FGameplayTag Item_Weapon_Gun_AssaultRifle;
 
 	FGameplayTag Item_Equipment_;
 

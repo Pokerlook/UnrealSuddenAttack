@@ -42,7 +42,13 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
-	// Called when the game starts or when spawned
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+		TArray < TSubclassOf < class UGameplayAbility >> StartupAbilities;
+
+	// 패션 skeletalmesh 관련 필요. 
+
+
 	virtual void BeginPlay() override;
 
 	UPROPERTY()
@@ -54,11 +60,8 @@ protected:
 	void AddCharacterAbilities();
 
 	void AimOffset(float DeltaTime);
+
 private:
-
-	UPROPERTY(EditAnywhere, Category = "Abilities")
-		TArray < TSubclassOf < class UGameplayAbility >> StartupAbilities;
-
 
 	// Anim variable
 	float Lean;
@@ -86,6 +89,5 @@ private:
 	// Anim variable
 
 
-	// 패션 skeletalmesh 관련 필요. 
 
 };
