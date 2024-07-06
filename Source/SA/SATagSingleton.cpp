@@ -177,7 +177,7 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 		FString("Drop item from inventory, event tag")
 	);
 	GameplayTags.Event_Inventory_UnequipItem = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Event.Inventory,UnequipItem"),
+		FName("Event.Inventory.UnequipItem"),
 		FString("Unequip item, event tag")
 	);
 	// event

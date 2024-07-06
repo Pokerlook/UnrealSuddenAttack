@@ -19,20 +19,14 @@ USAInventoryComponent::USAInventoryComponent()
 
 }
 
-void USAInventoryComponent::InitializeComponent()
+void USAInventoryComponent::InitInventory(UAbilitySystemComponent* ASC)
 {
-	Super::InitializeComponent();
-
 	const FSAGameplayTags& GameplayTags = FSAGameplayTags::Get();
-	if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner()))
-	{
-		ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_AddItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
-		ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_EquipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
-		ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_DropItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
-		ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_UnequipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
-	}
+	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_AddItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
+	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_EquipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
+	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_DropItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
+	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_UnequipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
 }
-
 
 // Called when the game starts
 void USAInventoryComponent::BeginPlay()

@@ -58,5 +58,7 @@ void ASAWeaponBase::Equip(AActor* InOwner)
 	ACharacter* Character = Cast<ACharacter>(InOwner);
 	const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(AttachmentSocket);
 	check(HandSocket);
-	HandSocket->AttachActor(this, Character->GetMesh());
+	this->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), AttachmentSocket); // scale1로 하면 뭔가 어색
+	
+	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

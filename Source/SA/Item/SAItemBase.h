@@ -32,8 +32,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int StackSize;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int Quantity;
 };
 
 UCLASS()

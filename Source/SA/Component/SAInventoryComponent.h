@@ -15,7 +15,7 @@ class SA_API USAInventoryComponent : public UActorComponent
 
 public:	
 	USAInventoryComponent();
-	virtual void InitializeComponent() override;
+	void InitInventory(UAbilitySystemComponent* ASC);
 
 
 protected:

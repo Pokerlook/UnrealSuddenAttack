@@ -120,6 +120,7 @@ void ASAPlayableCharacter::PossessedBy(AController* NewController)
 	// Init ability actor info for the Server
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+	InventoryComponent->InitInventory(GetAbilitySystemComponent());
 }
 
 void ASAPlayableCharacter::OnRep_PlayerState()
