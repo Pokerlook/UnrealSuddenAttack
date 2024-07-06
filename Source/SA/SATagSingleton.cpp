@@ -158,11 +158,28 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 
 	// Item
 	GameplayTags.Item_Weapon_Gun_AssaultRifle = UGameplayTagsManager::Get().AddNativeGameplayTag(
-		FName("Item_Weapon.Gun.AssaultRifle"),
+		FName("Item.Weapon.Gun.AssaultRifle"),
 		FString("AssaultRilfe identifier tag")
 	);
 	// Item
 
-
+	// event
+	GameplayTags.Event_Inventory_AddItem = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Inventory.AddItem"),
+		FString("Add item to inventory, event tag")
+	);
+	GameplayTags.Event_Inventory_EquipItem = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Inventory.EquipItem"),
+		FString("Equip item, event tag")
+	);
+	GameplayTags.Event_Inventory_DropItem = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Inventory.DropItem"),
+		FString("Drop item from inventory, event tag")
+	);
+	GameplayTags.Event_Inventory_UnequipItem = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Inventory,UnequipItem"),
+		FString("Unequip item, event tag")
+	);
+	// event
 
 }

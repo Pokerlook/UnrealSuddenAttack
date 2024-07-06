@@ -38,16 +38,15 @@ void ASAItemBase::HideInteractWidget()
 	}
 }
 
-void ASAItemBase::InteractStart()
+void ASAItemBase::InteractStart(AActor* Interactor)
 {
-	// Get Item, check get item event...
-	UE_LOG(LogTemp, Warning, TEXT("ItemBase Interact start"));
+	// check if interactor has iventory interface. check if there is space to add item.
+	// send gameplay event to actor, add item event. and destory self.
 }
 
-void ASAItemBase::InteractEnd()
+void ASAItemBase::InteractEnd(AActor* Interactor)
 {
-	// Empty
-	UE_LOG(LogTemp, Warning, TEXT("ItemBase Interact end"));
+	// start? end?
 }
 
 void ASAItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -55,6 +54,7 @@ void ASAItemBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASAItemBase, ItemState);
+	//DOREPLIFETIME(ASAItemBase, ItemData); °í¹Î...
 }
 
 void ASAItemBase::OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

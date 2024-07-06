@@ -94,12 +94,14 @@ void ASAPlayableCharacter::InteractCommand(bool Value)
 	if (Value == true && !ThisInteract) return;
 	if (Value == false)
 	{
-		ThisInteract->InteractEnd();
+		if (!ThisInteract) return;
+		ThisInteract->InteractEnd(this);
 		isInteracting = false;
 	}
 	if (Value == true)
 	{
-		ThisInteract->InteractStart();
+		if (!ThisInteract) return;
+		ThisInteract->InteractStart(this);
 		isInteracting = true;
 	}
 }

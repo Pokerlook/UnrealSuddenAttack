@@ -85,6 +85,17 @@ public:
 		ItemTags
 	*/
 
+	/*
+		EventTags
+	*/
+	FGameplayTag Event_Inventory_AddItem;
+	FGameplayTag Event_Inventory_EquipItem;
+	FGameplayTag Event_Inventory_DropItem;
+	FGameplayTag Event_Inventory_UnequipItem;
+	/*
+		EventTags
+	*/
+
 private:
 	static FSAGameplayTags GameplayTags;
 };

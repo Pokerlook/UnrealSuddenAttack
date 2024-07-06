@@ -16,7 +16,7 @@ class UInteractInterface : public UInterface
 /**
  * 
  */
-class SA_API IInteractInterface
+class SA_API IInteractInterface	// for item, interact actor(door, etc...), ...
 {
 	GENERATED_BODY()
 
@@ -25,7 +25,7 @@ public:
 
 	virtual void ShowInteractWidget() = 0;
 	virtual void HideInteractWidget() = 0;
-	virtual void InteractStart() = 0;
-	virtual void InteractEnd() = 0;
+	virtual void InteractStart(AActor* Interactor) = 0;
+	virtual void InteractEnd(AActor* Interactor) = 0;
 
 };

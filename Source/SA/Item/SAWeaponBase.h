@@ -5,21 +5,45 @@
 #include "CoreMinimal.h"
 #include "SAItemBase.h"
 #include "SA/SATypes.h"
+#include "SA/Interface/EquipmentInterface.h"
 #include "SAWeaponBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SA_API ASAWeaponBase : public ASAItemBase
+class SA_API ASAWeaponBase : public ASAItemBase, public IEquipmentInterface
 {
 	GENERATED_BODY()
 
 public:
 	ASAWeaponBase();
 
+	//interact
+	virtual void InteractStart(AActor* Interactor) override;
+	virtual void InteractEnd(AActor* Interactor) override;
+	//interact
+
+	//equip
+	virtual void Equip(AActor* InOwner) override;
+	//equip
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)	// 이것도 캐릭터ASC 태그 콜백으로 prone add나 remove면 attach 바꿔야 할 것
+		FName AttachmentSocket = FName("Socket_Gun");
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FName AttachmentSocketProne = FName("Socket_GunProne");
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float FireRate;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float BaseDamage;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		USoundBase* AttackSound;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FGameplayTag AmmoTag;
+
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
 		USkeletalMeshComponent* WeaponMesh;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")

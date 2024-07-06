@@ -34,29 +34,3 @@ enum class EItemState : uint8
 
 	DefaultMAX UMETA(DisplayName = "DefaultMAX")
 };
-
-USTRUCT(Atomic, BlueprintType)
-struct FS_ItemStaticData
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	FS_ItemStaticData() : IdentifierTag(), Name(), ItemExplanation(), Icon(), RefClass(), StackSize(1)
-	{}
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FGameplayTag IdentifierTag;	// 이걸로 데이터베이스에서 서치.
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		FText Name;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		FText ItemExplanation;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		UTexture2D* Icon;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		TSubclassOf<class ASAItemBase> RefClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int StackSize;
-};

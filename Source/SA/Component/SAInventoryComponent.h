@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "SAInventoryComponent.generated.h"
 
 
@@ -13,20 +14,24 @@ class SA_API USAInventoryComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	USAInventoryComponent();
+	virtual void InitializeComponent() override;
+
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	class ASAWeaponBase* CurrentWeapon; // now weapon in hands
-//	class ASAWeaponBase* NextWeapon; // next weapon to change
+private:
+	class ASAWeaponBase* CurrentWeapon = nullptr; // now weapon in hands
+	class ASAWeaponBase* NextWeapon = nullptr; // next weapon to change
 //	TArray<ASAWeaponBase> EquippingWeapons;
-	// equipment(Çï¸ä,Á¶³¢,¹è³¶?) ¹è¿­ º¯¼ö ³ªÁß¿¡ Ãß°¡ÇÒ µí
-		
+	// equipment(Çï¸ä,Á¶³¢,¹è³¶?) ¹è¿­ º¯¼ö ³ªÁß¿¡ Ãß°¡ÇÒ µí. mapÀ¸·Î?
+
+
+	virtual void GameplayEventCallback(const FGameplayEventData* Payload);
+
+	void HandleGameplayEventInternal(FGameplayEventData Payload);
+	UFUNCTION(Server, Reliable)
+		void ServerHandleGameplayEvent(FGameplayEventData Payload);
+
 };

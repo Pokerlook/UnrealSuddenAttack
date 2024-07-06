@@ -8,6 +8,34 @@
 #include "SA/SATypes.h"
 #include "SAItemBase.generated.h"
 
+USTRUCT(Atomic, BlueprintType)
+struct FS_ItemStaticData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	FS_ItemStaticData() : IdentifierTag(), Name(), ItemExplanation(), Icon(), RefClass(), StackSize(1)
+	{}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		FGameplayTag IdentifierTag;	// 이걸로 데이터베이스에서 서치.
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FText Name;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FText ItemExplanation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		UTexture2D* Icon;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		TSubclassOf<class ASAItemBase> RefClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int StackSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Quantity;
+};
+
 UCLASS()
 class SA_API ASAItemBase : public AActor, public IInteractInterface
 {
@@ -20,8 +48,8 @@ public:
 	// interact intf
 	virtual void ShowInteractWidget() override;
 	virtual void HideInteractWidget() override;
-	virtual void InteractStart() override;
-	virtual void InteractEnd() override;
+	virtual void InteractStart(AActor* Interactor) override;
+	virtual void InteractEnd(AActor* Interactor) override;
 	// interact intf
 
 
@@ -38,7 +66,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 		class UWidgetComponent* PickupWidget;
-	UPROPERTY(VisibleAnywhere, Category = "Item")
+	UPROPERTY(VisibleAnywhere, Category = "Item")// Replicated 해야하나?
 		FS_ItemStaticData ItemData;
 
 	// 이름(태그), 설명, 아이템 클래스 는 Static Data 구조체 -> 런타임에 안 바뀜
