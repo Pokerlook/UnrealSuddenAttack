@@ -100,6 +100,16 @@ EWeaponType ASACharacterBase::GetEquippedWeaponType() const
     return EquippedWeaponType;
 }
 
+void ASACharacterBase::SetWeaponType(EWeaponType ToType)
+{
+    EquippedWeaponType = ToType;
+}
+
+void ASACharacterBase::SetCharacterStance(ECharacterStance ToStand)
+{
+    CharacterStance = ToStand;  // crouch, prone 어빌리티에서... playmontage 끝났을 때 부르자.
+}
+
 void ASACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);

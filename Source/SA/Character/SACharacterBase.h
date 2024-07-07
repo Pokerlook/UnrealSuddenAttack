@@ -32,6 +32,9 @@ public:
 
 	virtual ECharacterStance GetStance() const override;
 	virtual EWeaponType GetEquippedWeaponType() const override;
+
+	virtual void SetWeaponType(EWeaponType ToType) override;
+	virtual void SetCharacterStance(ECharacterStance ToStand) override;
 	// Anim Interface
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -43,6 +46,11 @@ public:
 
 protected:
 
+	UPROPERTY()
+		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	UPROPERTY()
+		TObjectPtr<UAttributeSet> AttributeSet;
+
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 		TArray < TSubclassOf < class UGameplayAbility >> StartupAbilities;
 
@@ -50,12 +58,6 @@ protected:
 
 
 	virtual void BeginPlay() override;
-
-	UPROPERTY()
-		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY()
-		TObjectPtr<UAttributeSet> AttributeSet;
 
 	void AddCharacterAbilities();
 

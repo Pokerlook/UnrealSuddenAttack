@@ -2,6 +2,7 @@
 
 
 #include "SAWeaponBase.h"
+#include "SA/Interface/AnimInterface.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "Engine/SkeletalMeshSocket.h"
@@ -37,5 +38,11 @@ void ASAWeaponBase::Equip(AActor* InOwner)
 	this->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), AttachmentSocket); // scale1로 하면 뭔가 어색
 	
 	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	HideInteractWidget();
+	HideInteractWidget(); 
+	if (IAnimInterface* AnimInterface = Cast<IAnimInterface>(InOwner))
+	{
+		AnimInterface->SetWeaponType(WeaponType);
+	}
+
+	OnEquip();	//add effect and grant ability
 }

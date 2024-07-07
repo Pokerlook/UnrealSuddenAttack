@@ -17,4 +17,4 @@
 # 인벤토리... 아이템 배열... 구조체 저장. 구조체에 클래스ref 있어서 필요하면 spawn.
 ffastarrayserializer item
 
-interact 관련 PC에서 캐릭터로 옮기기.
+# 무기 종류 만들면 그거 장착했을때 ASACharacterBase에서 GetEquippedWeaponType 할 수 있도록 BeginPlay, EndPlay, OnGameplayTagAdded 함수 수정.

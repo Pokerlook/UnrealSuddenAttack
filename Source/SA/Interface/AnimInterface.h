@@ -36,4 +36,6 @@ public:
 	virtual bool IsAccelerating() const = 0;
 	virtual bool IsAiming() const = 0;
 
+	virtual void SetWeaponType(EWeaponType ToType) = 0;
+	virtual void SetCharacterStance(ECharacterStance ToStand) = 0;
 };

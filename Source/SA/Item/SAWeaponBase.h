@@ -27,6 +27,9 @@ protected:
 		FName AttachmentSocket = FName("Socket_Gun");
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		FName AttachmentSocketProne = FName("Socket_GunProne");
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		EWeaponType WeaponType = EWeaponType::MainRangeWeapon;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		float FireRate;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
