@@ -17,6 +17,8 @@ public:
 	USAInventoryComponent();
 	void InitInventory(UAbilitySystemComponent* ASC);
 
+//	void ChangeWeaponWithItem(ASAWeaponBase* ToChangeWeapon); // inventory ui만들 때 필요
+//인벤토리에서 장착하면, 이벤트 받았을때랑 달리 이미 장착한 거라도 강제로 바꿈. 현재 unequip&destory. 이거 spawn&eqeuip
 
 protected:
 	virtual void BeginPlay() override;

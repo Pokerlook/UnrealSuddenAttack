@@ -3,26 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SAItemBase.h"
+#include "SAEquipmentItem.h"
 #include "SA/SATypes.h"
-#include "SA/Interface/EquipmentInterface.h"
 #include "SAWeaponBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SA_API ASAWeaponBase : public ASAItemBase, public IEquipmentInterface
+class SA_API ASAWeaponBase : public ASAEquipmentItem
 {
 	GENERATED_BODY()
 
 public:
 	ASAWeaponBase();
-
-	//interact
-	virtual void InteractStart(AActor* Interactor) override;
-	virtual void InteractEnd(AActor* Interactor) override;
-	//interact
 
 	//equip
 	virtual void Equip(AActor* InOwner) override;
@@ -41,6 +35,8 @@ protected:
 		USoundBase* AttackSound;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 		FGameplayTag AmmoTag;
+
+	// weapon projectile class
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")

@@ -74,8 +74,7 @@ void USAInventoryComponent::HandleGameplayEventInternal(FGameplayEventData Paylo
 			check(EquipmentIntf);	// Equip event는 EquipIntf 있는 얘만 보낼 수 있음
 			EquipmentIntf->Equip(GetOwner());
 
-
-			UE_LOG(LogTemp, Error, TEXT("Event_Inventory_EquipItem Tag get"));
+			CurrentWeapon = const_cast<ASAWeaponBase*>(Cast<ASAWeaponBase>(Payload.OptionalObject)); // temp
 		}
 		else if (EventTag == GameplayTags.Event_Inventory_UnequipItem)
 		{

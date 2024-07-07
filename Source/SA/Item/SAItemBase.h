@@ -50,6 +50,7 @@ public:
 	virtual void InteractEnd(AActor* Interactor) override;
 	// interact intf
 
+	// item intf drop... 인벤토리에서 생성해서. 캐릭터 발바닥에 놓고. drop 해가지고 몇초뒤에 제거. interact에서 사라짐 타이머 클리어.
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -65,16 +66,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 		class UWidgetComponent* PickupWidget;
 	UPROPERTY(VisibleAnywhere, Category = "Item")// Replicated 해야하나?
-		FS_ItemStaticData ItemData;
-
-	// 이름(태그), 설명, 아이템 클래스 는 Static Data 구조체 -> 런타임에 안 바뀜
+		FS_ItemStaticData ItemData;	// 이름(태그), 설명, 아이템 클래스 는 Static Data 구조체 -> 런타임에 안 바뀜
 	// 그 외에는 상속받은 곳에서...
-private:
-	USceneComponent* RootSceneComponent;
-
 
 	UPROPERTY(ReplicatedUsing = OnRep_ItemState)
 		EItemState ItemState = EItemState::Initial;
+		
+private:
+	USceneComponent* RootSceneComponent;
 
 	UFUNCTION()
 		void OnRep_ItemState();

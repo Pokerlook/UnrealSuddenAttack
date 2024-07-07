@@ -163,6 +163,7 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 	);
 	// Item
 
+
 	// event
 	GameplayTags.Event_Inventory_AddItem = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Event.Inventory.AddItem"),
