@@ -90,6 +90,16 @@ bool ASACharacterBase::IsAiming() const
     return bIsAiming;
 }
 
+bool ASACharacterBase::ShouldUseIK() const
+{
+    if (GetEquippedWeaponType() == EWeaponType::None) return false;
+    // 무기 장착시 true. 하지만 reload & change weapon시 false, 죽었을때도 false
+
+    // reload, change weapon, death는 tag로. 체크.
+
+    return true;
+}
+
 ECharacterStance ASACharacterBase::GetStance() const
 {
     return CharacterStance;
@@ -97,17 +107,17 @@ ECharacterStance ASACharacterBase::GetStance() const
 
 EWeaponType ASACharacterBase::GetEquippedWeaponType() const
 {
-    return EquippedWeaponType;
+    return EWeaponType::None;
 }
 
-void ASACharacterBase::SetWeaponType(EWeaponType ToType)
+USkeletalMeshComponent* ASACharacterBase::GetCharacterMesh() const
 {
-    EquippedWeaponType = ToType;
+    return GetMesh();;
 }
 
-void ASACharacterBase::SetCharacterStance(ECharacterStance ToStand)
+FTransform ASACharacterBase::GetWeaponLeftHandSocketTransform() const
 {
-    CharacterStance = ToStand;  // crouch, prone 어빌리티에서... playmontage 끝났을 때 부르자.
+    return FTransform();
 }
 
 void ASACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

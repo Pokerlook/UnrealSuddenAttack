@@ -14,7 +14,14 @@
 
 # 데이터 테이블을 사용하여 아이템 데이터를 관리하고, 게임플레이 태그를 사용하여 아이템을 식별
 
-# 인벤토리... 아이템 배열... 구조체 저장. 구조체에 클래스ref 있어서 필요하면 spawn.
+# 인벤토리... 아이템 배열... 구조체 저장. 구조체에 클래스ref 있어서 필요하면 spawn..
 ffastarrayserializer item
 
-# 무기 종류 만들면 그거 장착했을때 ASACharacterBase에서 GetEquippedWeaponType 할 수 있도록 BeginPlay, EndPlay, OnGameplayTagAdded 함수 수정.
+# crouch, prone 어빌리티 구현 할 때 anim인터페이스로 stance 셋.. CharacterStance도 replicate 해야하나? 어빌리티에서 바꿀거니까 ㄱㅊ은가?
+
+# 캐릭터base에 bUseFABRIK을 replicate 해야하나? bAiming도 replicate 해야하나? 재장전/aiming 구현할 때 한번 보자.
+
+# 모든 무기엔 LeftHandSocket 소켓이 있어야 한다.
+
+
+

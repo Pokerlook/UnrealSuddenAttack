@@ -31,11 +31,11 @@ public:
 
 	virtual ECharacterStance GetStance() const = 0;
 	virtual EWeaponType GetEquippedWeaponType() const = 0;
+	virtual USkeletalMeshComponent* GetCharacterMesh() const = 0;
+	virtual FTransform GetWeaponLeftHandSocketTransform() const = 0;
 
 	virtual bool IsInAir() const = 0;
 	virtual bool IsAccelerating() const = 0;
 	virtual bool IsAiming() const = 0;
-
-	virtual void SetWeaponType(EWeaponType ToType) = 0;
-	virtual void SetCharacterStance(ECharacterStance ToStand) = 0;
+	virtual bool ShouldUseIK() const = 0;
 };

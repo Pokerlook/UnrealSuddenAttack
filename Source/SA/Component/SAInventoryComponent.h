@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Abilities/GameplayAbilityTypes.h"
+#include "SA/SATypes.h"
 #include "SAInventoryComponent.generated.h"
 
+class ASAWeaponBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SA_API USAInventoryComponent : public UActorComponent
@@ -16,16 +18,22 @@ class SA_API USAInventoryComponent : public UActorComponent
 public:	
 	USAInventoryComponent();
 	void InitInventory(UAbilitySystemComponent* ASC);
+	EWeaponType GetWeaponType();
+	virtual FTransform GetWeaponLeftHandSocketTransform() const;
 
 //	void ChangeWeaponWithItem(ASAWeaponBase* ToChangeWeapon); // inventory ui만들 때 필요
 //인벤토리에서 장착하면, 이벤트 받았을때랑 달리 이미 장착한 거라도 강제로 바꿈. 현재 unequip&destory. 이거 spawn&eqeuip
+
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	class ASAWeaponBase* CurrentWeapon = nullptr; // now weapon in hands
-	class ASAWeaponBase* NextWeapon = nullptr; // next weapon to change
+	UPROPERTY(Replicated)
+		ASAWeaponBase* CurrentWeapon = nullptr; // now weapon in hands
+	ASAWeaponBase* NextWeapon = nullptr; // next weapon to change
 //	TArray<ASAWeaponBase> EquippingWeapons;
 	// equipment(헬멧,조끼,배낭?) 배열 변수 나중에 추가할 듯. map으로?
 

@@ -20,9 +20,9 @@ void USAAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
 
-	if (!AnimIntf || AnimIntf && !IsValid(AnimIntf->_getUObject()) )  //
+	if (!AnimIntf || AnimIntf && !IsValid(AnimIntf->_getUObject()))  //
 	{
-//		UE_LOG(LogTemp, Warning, TEXT("Pawn Owner doesn't have AnimInterface"));
+		//		UE_LOG(LogTemp, Warning, TEXT("Pawn Owner doesn't have AnimInterface"));
 		return;
 	}
 
@@ -39,4 +39,16 @@ void USAAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	CharacterStance = AnimIntf->GetStance();
 	EquippedWeaponType = AnimIntf->GetEquippedWeaponType();
 
+	bUseFABRIK = AnimIntf->ShouldUseIK(); 
+	if (bUseFABRIK && EquippedWeaponType!=EWeaponType::None && AnimIntf->GetCharacterMesh())
+	{
+		LeftHandTransform = AnimIntf->GetWeaponLeftHandSocketTransform();
+		//if (!LeftHandTransform.Equals(FTransform::Identity))	// 이거 체크는 AnimBP에서 bool 블렌딩으로 하자
+		FVector OutPosition;
+		FRotator OutRotation;
+		// 무기의 소켓 위치를, 우리 캐릭터의 오른손 기준으로 얻고 싶다.
+		AnimIntf->GetCharacterMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), FRotator::ZeroRotator, OutPosition, OutRotation);
+		LeftHandTransform.SetLocation(OutPosition);
+		LeftHandTransform.SetRotation(FQuat(OutRotation));
+	}
 }

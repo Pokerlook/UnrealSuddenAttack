@@ -41,6 +41,11 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 	InventoryComponent->SetIsReplicated(true);
 }
 
+EWeaponType ASAPlayableCharacter::GetEquippedWeaponType() const
+{	
+	return InventoryComponent->GetWeaponType();
+}
+
 void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 {
 	if (Controller == nullptr) return;
@@ -104,6 +109,11 @@ void ASAPlayableCharacter::InteractCommand(bool Value)
 		ThisInteract->InteractStart(this);
 		isInteracting = true;
 	}
+}
+
+FTransform ASAPlayableCharacter::GetWeaponLeftHandSocketTransform() const
+{
+	return InventoryComponent->GetWeaponLeftHandSocketTransform();
 }
 
 void ASAPlayableCharacter::Tick(float DeltaTime)

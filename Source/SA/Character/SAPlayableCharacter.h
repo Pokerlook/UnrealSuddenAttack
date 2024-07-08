@@ -20,12 +20,17 @@ class SA_API ASAPlayableCharacter : public ASACharacterBase, public ICommandInte
 public:
 	ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer);
 
+	virtual EWeaponType GetEquippedWeaponType() const override;
 	// Command Interface
 	virtual void MoveCommand(FVector2D Value) override;
 	virtual void LookCommand(FVector2D Value) override;
 	virtual void JumpCommand(bool Value) override;
 	virtual void InteractCommand(bool Value) override;
 	// command
+	
+	// anim
+	virtual FTransform GetWeaponLeftHandSocketTransform() const override;
+	// anim
 
 	virtual void Tick(float DeltaTime) override;
 	virtual void PossessedBy(AController* NewController) override;

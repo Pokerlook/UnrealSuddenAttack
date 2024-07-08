@@ -28,13 +28,14 @@ public:
 
 	virtual bool IsInAir() const override;
 	virtual bool IsAccelerating() const override;
-	virtual bool IsAiming() const override;
+	virtual bool IsAiming() const override;		// aiming은 기본적으로 true로 하고. 총 안쏘고 3초?5초? 후에 false로 바꾸는데, 태그에 aiming 이면 안 바꿈...
+	// 태그 추가&제거마다 타이머 클리어하고 다시 돌리고 하면 되겠다. // aiming이면 컨트롤러쪽으로 캐릭터 회전.
+	virtual bool ShouldUseIK() const override;
 
 	virtual ECharacterStance GetStance() const override;
 	virtual EWeaponType GetEquippedWeaponType() const override;
-
-	virtual void SetWeaponType(EWeaponType ToType) override;
-	virtual void SetCharacterStance(ECharacterStance ToStand) override;
+	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
+	virtual FTransform GetWeaponLeftHandSocketTransform() const override;
 	// Anim Interface
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -80,13 +81,9 @@ private:
 	float Pitch;
 	FRotator StartingAimRotation;
 
-	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 bp에 노출 안할 거
 	ECharacterStance CharacterStance = ECharacterStance::Stand;
 
 	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 bp에 노출 안할 거
-	EWeaponType EquippedWeaponType = EWeaponType::None;	 // 나중에 무기 변수로 바꿀 것, 무기타입은 무기->GetType할 것.
-
-	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 지울 변수
 		bool bIsAiming = false;
 	// Anim variable
 

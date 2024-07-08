@@ -10,6 +10,8 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values for this component's properties
 USAInventoryComponent::USAInventoryComponent()
 {
@@ -26,6 +28,33 @@ void USAInventoryComponent::InitInventory(UAbilitySystemComponent* ASC)
 	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_EquipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
 	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_DropItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
 	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_UnequipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
+}
+
+EWeaponType USAInventoryComponent::GetWeaponType()
+{
+	if (CurrentWeapon)
+	{
+		return CurrentWeapon->GetWeaponType();
+	}
+	return EWeaponType::None;
+}
+
+FTransform USAInventoryComponent::GetWeaponLeftHandSocketTransform() const
+{
+	if (!CurrentWeapon) return FTransform();
+	if (!CurrentWeapon->GetWeaponMesh()) return FTransform();
+
+	FTransform LeftHandSocketTransform = CurrentWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"), ERelativeTransformSpace::RTS_World);
+	return LeftHandSocketTransform;
+}
+
+
+
+void USAInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(USAInventoryComponent, CurrentWeapon);
 }
 
 // Called when the game starts
@@ -68,7 +97,7 @@ void USAInventoryComponent::HandleGameplayEventInternal(FGameplayEventData Paylo
 		else if (EventTag == GameplayTags.Event_Inventory_EquipItem)	// const_cast를 쓰지 않으면 복잡해질 거 같음.
 		{
 			//받은 Payload.OptionalObject; 캐스트해서(인터페이스?) 이게 무기인지 방어구인지 체크. 
-			//어떤 타입인지 체크 후 이미 장착했으면 addItem, 아니면 계속 진행
+			//어떤 타입인지 체크 후 이미 장착한 상태면 장착한거 버리고 이걸로 낌.
 			
 			IEquipmentInterface* EquipmentIntf = const_cast<IEquipmentInterface*>(Cast<IEquipmentInterface>(Payload.OptionalObject));
 			check(EquipmentIntf);	// Equip event는 EquipIntf 있는 얘만 보낼 수 있음

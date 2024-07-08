@@ -16,6 +16,11 @@ class SA_API ASAAICharacter : public ASACharacterBase
 public:
 	ASAAICharacter(const FObjectInitializer& ObjectInitializer);
 
+	//anim
+	//virtual FTransform GetWeaponLeftHandSocketTransform() const override;
+	//virtual bool IsAiming() const override;
+	//anim
+
 protected:
 	virtual void BeginPlay() override;
 };
