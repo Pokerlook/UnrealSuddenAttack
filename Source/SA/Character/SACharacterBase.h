@@ -47,7 +47,7 @@ public:
 
 protected:
 
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_AbilitySystemComponent)
 		TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	UPROPERTY()
 		TObjectPtr<UAttributeSet> AttributeSet;
@@ -57,6 +57,8 @@ protected:
 
 	// 패션 skeletalmesh 관련 필요. 
 
+	UFUNCTION()
+		virtual void OnRep_AbilitySystemComponent() {}
 
 	virtual void BeginPlay() override;
 

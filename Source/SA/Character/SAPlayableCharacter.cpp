@@ -106,7 +106,8 @@ void ASAPlayableCharacter::InteractCommand(bool Value)
 	if (Value == true)
 	{
 		if (!ThisInteract) return;
-		ThisInteract->InteractStart(this);
+		ThisInteract->InteractStart(this); 
+		UE_LOG(LogTemp, Warning, TEXT("%s : InteractStart "), *ThisInteract.GetObject()->GetName());
 		isInteracting = true;
 	}
 }
@@ -159,6 +160,17 @@ void ASAPlayableCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASAPlayableCharacter, InventoryComponent);
+}
+
+void ASAPlayableCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void ASAPlayableCharacter::OnRep_AbilitySystemComponent()
+{
+	InventoryComponent->InitInventory(AbilitySystemComponent);
 }
 
 void ASAPlayableCharacter::InitAbilityActorInfo()

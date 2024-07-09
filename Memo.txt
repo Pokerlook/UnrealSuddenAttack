@@ -22,6 +22,7 @@ ffastarrayserializer item
 # 캐릭터base에 bUseFABRIK을 replicate 해야하나? bAiming도 replicate 해야하나? 재장전/aiming 구현할 때 한번 보자.
 
 # 모든 무기엔 LeftHandSocket 소켓이 있어야 한다.
+-> 양손 각각 따로 무기 하나씩 쥐고 싶을 때? 무기에 should use left hand IK 함수 만들까?
 
-
+rifle_stand_jump_end 너무 긴데. 0.8초... 0.2초 정도로 압축? 어떻게?
 

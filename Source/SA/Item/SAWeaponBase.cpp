@@ -36,17 +36,25 @@ void ASAWeaponBase::Equip(AActor* InOwner)
 	check(HandSocket);
 	this->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), AttachmentSocket); // scale1로 하면 뭔가 어색
 	
-	if (HasAuthority())
-	{
-		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		HideInteractWidget();
-	}
-
 	OnEquip();	//add effect and grant ability
+
+	ItemState = EItemState::InUse;
+	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HideInteractWidget();
 }
 
 EWeaponType ASAWeaponBase::GetWeaponType()
 {
 	return WeaponType;
+}
+
+void ASAWeaponBase::OnRep_ItemState()
+{
+	Super::OnRep_ItemState();
+	if (ItemState == EItemState::InUse)
+	{
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		HideInteractWidget();
+	}
 }
 

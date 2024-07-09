@@ -40,6 +40,9 @@ public:
 
 protected:
 
+	virtual void BeginPlay() override;
+
+	virtual void OnRep_AbilitySystemComponent() override;
 private:	
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -58,6 +61,8 @@ private:
 	TScriptInterface<IInteractInterface> ThisInteract;
 	TScriptInterface<IInteractInterface> LastInteract;
 	bool isInteracting = false;
+
+	//UFUNCTION() void OnRep_Interact();//TScriptInterface<IInteractInterface> ThisInteract
 
 	void CheckInteractInterface();
 

@@ -29,7 +29,7 @@ protected:
 	float YawLastTick;
 	float YawNow;
 	float YawChangeOverFrame;
-	ACharacter* Character;
+//	ACharacter* Character;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 		float Direction = 0;

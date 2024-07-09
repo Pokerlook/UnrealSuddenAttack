@@ -71,12 +71,11 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ItemState)
 		EItemState ItemState = EItemState::Initial;
-		
-private:
-	USceneComponent* RootSceneComponent;
 
 	UFUNCTION()
-		void OnRep_ItemState();
+		virtual void OnRep_ItemState();
+private:
+	USceneComponent* RootSceneComponent;
 
 	//// Destruction timer handle
 	//FTimerHandle DestructionTimerHandle;

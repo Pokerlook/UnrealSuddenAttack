@@ -11,7 +11,7 @@ void USAAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	AnimIntf = TryGetPawnOwner();
-	Character = Cast<ACharacter>(TryGetPawnOwner());
+//	Character = Cast<ACharacter>(TryGetPawnOwner());
 //	check(AnimIntf);
 
 }

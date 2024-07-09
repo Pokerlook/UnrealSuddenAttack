@@ -36,6 +36,7 @@ void ASAEquipmentItem::InteractStart(AActor* Interactor)
 	// if not. send gameplay event to actor, equip item event.
 	// 아니면. 그냥 inventory 콜백함수에서 처리할까.
 
+	UE_LOG(LogTemp, Warning, TEXT("SendGameplayEventToInteractor : %s"), *Interactor->GetName());
 
 	const FSAGameplayTags& GameplayTags = FSAGameplayTags::Get();
 

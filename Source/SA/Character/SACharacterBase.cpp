@@ -125,6 +125,7 @@ void ASACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ASACharacterBase, Yaw);
+    DOREPLIFETIME(ASACharacterBase, AbilitySystemComponent);
 }
 
 // Called when the game starts or when spawned

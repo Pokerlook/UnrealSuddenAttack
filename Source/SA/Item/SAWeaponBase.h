@@ -44,7 +44,8 @@ protected:
 		FGameplayTag AmmoTag;
 
 	// weapon projectile class
-
+	
+	virtual void OnRep_ItemState() override;
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Properties")
