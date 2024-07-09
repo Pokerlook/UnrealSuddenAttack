@@ -120,11 +120,17 @@ FTransform ASACharacterBase::GetWeaponLeftHandSocketTransform() const
     return FTransform();
 }
 
+ETurningInPlace ASACharacterBase::GetTurningInPlace() const
+{
+    return TurningInPlace;
+}
+
 void ASACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(ASACharacterBase, Yaw);
+    DOREPLIFETIME(ASACharacterBase, TurningInPlace);
     DOREPLIFETIME(ASACharacterBase, AbilitySystemComponent);
 }
 
@@ -168,13 +174,19 @@ void ASACharacterBase::AimOffset(float DeltaTime)
         FRotator DeltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation, StartingAimRotation);
         SetYaw(DeltaAimRotation.Yaw);
 
-        bUseControllerRotationYaw = false;
+        if (TurningInPlace == ETurningInPlace::TIP_NotTurning)
+        {
+            InterpYaw = Yaw;
+        }
+        bUseControllerRotationYaw = true;
+        TurnInPlace(DeltaTime);
     }
     if (Speed > 0.f || bIsInAir) // running, or jumping
     {
         StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
         SetYaw(0.f);
-        bUseControllerRotationYaw = true;
+        bUseControllerRotationYaw = true; 
+        TurningInPlace = ETurningInPlace::TIP_NotTurning;
     }
 
     Pitch = GetBaseAimRotation().Pitch;
@@ -186,6 +198,29 @@ void ASACharacterBase::AimOffset(float DeltaTime)
         Pitch = FMath::GetMappedRangeValueClamped(InRange, OutRange, Pitch);
     }
 
+}
+
+void ASACharacterBase::TurnInPlace(float DeltaTime)
+{
+    if (Yaw > 90.f)
+    {
+        SetTIP(ETurningInPlace::TIP_Right);
+    }
+    else if (Yaw < -90.f)
+    {
+        SetTIP(ETurningInPlace::TIP_Left);
+    }
+
+    if (TurningInPlace != ETurningInPlace::TIP_NotTurning)
+    {
+        InterpYaw = FMath::FInterpTo(InterpYaw, 0.f, DeltaTime, 4.f);
+        Yaw = InterpYaw;
+        if (FMath::Abs(Yaw) < 5.f)
+        {
+            SetTIP(ETurningInPlace::TIP_NotTurning);
+            StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+        }
+    }
 }
 
 void ASACharacterBase::ClientSetYaw_Implementation(float NewYaw)
@@ -200,6 +235,20 @@ void ASACharacterBase::SetYaw(float NewYaw)
         Yaw = NewYaw;
         // 서버에서 클라이언트로 RPC 호출하여 Yaw 값을 전달
         ClientSetYaw(NewYaw);
+    }
+}
+
+void ASACharacterBase::ClientSetTIP_Implementation(ETurningInPlace NewTIP)
+{
+    TurningInPlace = NewTIP;
+}
+
+void ASACharacterBase::SetTIP(ETurningInPlace NewTIP)
+{
+    if (HasAuthority())
+    {
+        TurningInPlace = NewTIP;
+        ClientSetTIP(NewTIP);
     }
 }
 

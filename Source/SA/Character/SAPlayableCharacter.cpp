@@ -226,11 +226,6 @@ void ASAPlayableCharacter::CheckInteractInterface()
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, TraceParams);
 
-	// Draw debug line
-#if WITH_EDITOR
-	DrawDebugLine(GetWorld(), Start + FollowCamera->GetForwardVector() * 100.0f, End, FColor::Green, false, 1, 0, 1);
-#endif
-
 	if (!bHit && !ThisInteract) return;
 	if (isInteracting) return;	// interact중이면 ThisInteract 가지고 있어야 하니 아래 코드 실행 안 함
 	LastInteract = ThisInteract;

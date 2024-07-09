@@ -37,7 +37,8 @@ void USAAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsAiming = AnimIntf->IsAiming();
 
 	CharacterStance = AnimIntf->GetStance();
-	EquippedWeaponType = AnimIntf->GetEquippedWeaponType();
+	EquippedWeaponType = AnimIntf->GetEquippedWeaponType(); 
+	TurningInPlace = AnimIntf->GetTurningInPlace();
 
 	bUseFABRIK = AnimIntf->ShouldUseIK(); 
 	if (bUseFABRIK && EquippedWeaponType!=EWeaponType::None && AnimIntf->GetCharacterMesh())

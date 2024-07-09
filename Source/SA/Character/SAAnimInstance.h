@@ -55,4 +55,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 		EWeaponType EquippedWeaponType;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+		ETurningInPlace TurningInPlace;
 };

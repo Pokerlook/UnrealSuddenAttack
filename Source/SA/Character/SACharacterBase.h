@@ -36,6 +36,7 @@ public:
 	virtual EWeaponType GetEquippedWeaponType() const override;
 	virtual USkeletalMeshComponent* GetCharacterMesh() const override;
 	virtual FTransform GetWeaponLeftHandSocketTransform() const override;
+	virtual ETurningInPlace GetTurningInPlace() const override;
 	// Anim Interface
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -65,6 +66,7 @@ protected:
 	void AddCharacterAbilities();
 
 	void AimOffset(float DeltaTime);
+	void TurnInPlace(float DeltaTime);
 
 private:
 
@@ -79,6 +81,7 @@ private:
 	UFUNCTION(Client, Reliable)
 		void ClientSetYaw(float NewYaw);
 	void SetYaw(float NewYaw);
+	float InterpYaw;
 
 	float Pitch;
 	FRotator StartingAimRotation;
@@ -87,6 +90,12 @@ private:
 
 	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 bp에 노출 안할 거
 		bool bIsAiming = false;
+
+	UPROPERTY(Replicated)
+	ETurningInPlace TurningInPlace = ETurningInPlace::TIP_NotTurning;
+	UFUNCTION(Client, Reliable)
+		void ClientSetTIP(ETurningInPlace NewTIP);
+	void SetTIP(ETurningInPlace NewTIP);
 	// Anim variable
 
 

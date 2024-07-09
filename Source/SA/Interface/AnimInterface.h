@@ -33,6 +33,7 @@ public:
 	virtual EWeaponType GetEquippedWeaponType() const = 0;
 	virtual USkeletalMeshComponent* GetCharacterMesh() const = 0;
 	virtual FTransform GetWeaponLeftHandSocketTransform() const = 0;
+	virtual ETurningInPlace GetTurningInPlace() const = 0;
 
 	virtual bool IsInAir() const = 0;
 	virtual bool IsAccelerating() const = 0;
