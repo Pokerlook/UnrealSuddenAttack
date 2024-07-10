@@ -153,6 +153,22 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Locomotion.Jump"),
 		FString("Jump Ability")
 	);
+	GameplayTags.Ability_Locomotion_Crouch = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Locomotion.Crouch"),
+		FString("Crouch Ability")
+	);
+	GameplayTags.Ability_Locomotion_Prone = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Locomotion.Prone"),
+		FString("Prone Ability")
+	);
+	GameplayTags.Ability_Locomotion_Sprint = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Locomotion.Sprint"),
+		FString("Sprint Ability")
+	);
+	GameplayTags.Ability_Locomotion_Sneek = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Locomotion.Sneek"),
+		FString("Sneek Ability")
+	);
 	// Ability Locomotion
 
 

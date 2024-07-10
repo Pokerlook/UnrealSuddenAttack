@@ -67,6 +67,10 @@ public:
 		LocomotionTags
 	*/
 	FGameplayTag Ability_Locomotion_Jump;
+	FGameplayTag Ability_Locomotion_Crouch;
+	FGameplayTag Ability_Locomotion_Prone;
+	FGameplayTag Ability_Locomotion_Sprint;
+	FGameplayTag Ability_Locomotion_Sneek;
 	/*
 		LocomotionTags
 	*/
