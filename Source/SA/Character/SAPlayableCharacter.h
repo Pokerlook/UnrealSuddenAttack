@@ -6,6 +6,7 @@
 #include "SA/Character/SACharacterBase.h"
 #include "SA/Interface/CommandInterface.h"
 #include "GameplayTagContainer.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "SAPlayableCharacter.generated.h"
 
 class IInteractInterface;
@@ -26,6 +27,8 @@ public:
 	virtual void LookCommand(FVector2D Value) override;
 	virtual void JumpCommand(bool Value) override;
 	virtual void InteractCommand(bool Value) override;
+	virtual void CrouchCommand() override;
+	virtual void ProneCommand() override;
 	// command
 	
 	// anim
@@ -52,6 +55,9 @@ private:
 	class UCameraComponent* FollowCamera;
 
 	void InitAbilityActorInfo();
+	void BindEventCallback();
+	void StanceEventCallback(const FGameplayEventData* Payload);
+
 	void AbilityStart(const FGameplayTag& InputTag);
 	void AbilityEnd(const FGameplayTag& InputTag);
 

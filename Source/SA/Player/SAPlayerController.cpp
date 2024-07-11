@@ -137,13 +137,15 @@ void ASAPlayerController::Jump(const FInputActionValue& Value)
 void ASAPlayerController::Crouch(const FInputActionValue& Value)
 {
 	if (!CharacterCommand) return;
-	UE_LOG(LogTemp, Warning, TEXT("C Crouch"));
+//	UE_LOG(LogTemp, Warning, TEXT("C Crouch")); 
+	CharacterCommand->CrouchCommand();
 }
 
 void ASAPlayerController::Prone(const FInputActionValue& Value)
 {
 	if (!CharacterCommand) return;
-	UE_LOG(LogTemp, Warning, TEXT("Z Prone"));
+//	UE_LOG(LogTemp, Warning, TEXT("Z Prone"));
+	CharacterCommand->ProneCommand();
 }
 
 void ASAPlayerController::Sneek(const FInputActionValue& Value)

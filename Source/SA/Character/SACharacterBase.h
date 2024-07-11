@@ -31,6 +31,7 @@ public:
 	virtual bool IsAiming() const override;		// aiming은 기본적으로 true로 하고. 총 안쏘고 3초?5초? 후에 false로 바꾸는데, 태그에 aiming 이면 안 바꿈...
 	// 태그 추가&제거마다 타이머 클리어하고 다시 돌리고 하면 되겠다. // aiming이면 컨트롤러쪽으로 캐릭터 회전.
 	virtual bool ShouldUseIK() const override;
+	virtual bool IsAnyMontagePlaying() const override;
 
 	virtual ECharacterStance GetStance() const override;
 	virtual EWeaponType GetEquippedWeaponType() const override;
@@ -68,6 +69,7 @@ protected:
 	void AimOffset(float DeltaTime);
 	void TurnInPlace(float DeltaTime);
 
+	void SetCharacterStance(ECharacterStance ToStance);
 private:
 
 	// Anim variable

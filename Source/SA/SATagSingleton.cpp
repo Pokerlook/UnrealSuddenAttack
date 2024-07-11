@@ -144,6 +144,22 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.State_InAir_Jumping = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("State.InAir.Jumping"),
 		FString("State InAir with Jumping")
+	); 
+	GameplayTags.State_Stance_Crouch = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Stance.Crouch"),
+		FString("State Crouching")
+	);
+	GameplayTags.State_Stance_Prone = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Stance.Prone"),
+		FString("State Proning")
+	);
+	GameplayTags.State_Movement_Sprint = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Movement.Sprint"),
+		FString("State Springting")
+	);
+	GameplayTags.State_Movement_Sneek = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("State.Movement.Sneek"),
+		FString("State Sneeking")
 	);
 	// State
 
@@ -196,6 +212,18 @@ void FSAGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Event_Inventory_UnequipItem = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Event.Inventory.UnequipItem"),
 		FString("Unequip item, event tag")
+	);
+	GameplayTags.Event_Locomotion_Stand = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Locomotion.Stand"),
+		FString("Locomotion Stand, event tag")
+	);
+	GameplayTags.Event_Locomotion_Crouch = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Locomotion.Crouch"),
+		FString("Locomotion Crouch, event tag")
+	);
+	GameplayTags.Event_Locomotion_Prone = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Event.Locomotion.Prone"),
+		FString("Locomotion Prone, event tag")
 	);
 	// event
 

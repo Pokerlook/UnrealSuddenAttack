@@ -112,6 +112,19 @@ void ASAPlayableCharacter::InteractCommand(bool Value)
 	}
 }
 
+void ASAPlayableCharacter::CrouchCommand()
+{
+	const FGameplayTag CrouchTag = FSAGameplayTags::Get().InputTag_Crouch;
+	AbilityStart(CrouchTag);
+	UE_LOG(LogTemp, Warning, TEXT("PCharacter :: Crouch"));
+}
+
+void ASAPlayableCharacter::ProneCommand()
+{
+	const FGameplayTag ProneTag = FSAGameplayTags::Get().InputTag_Prone;
+	AbilityStart(ProneTag);
+}
+
 FTransform ASAPlayableCharacter::GetWeaponLeftHandSocketTransform() const
 {
 	return InventoryComponent->GetWeaponLeftHandSocketTransform();
@@ -132,6 +145,7 @@ void ASAPlayableCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
 	InventoryComponent->InitInventory(GetAbilitySystemComponent());
+	BindEventCallback();
 }
 
 void ASAPlayableCharacter::OnRep_PlayerState()
@@ -140,6 +154,12 @@ void ASAPlayableCharacter::OnRep_PlayerState()
 
 	// Init ability actor info for the Client
 	InitAbilityActorInfo();
+}
+
+void ASAPlayableCharacter::OnRep_AbilitySystemComponent()
+{
+	InventoryComponent->InitInventory(AbilitySystemComponent);
+	BindEventCallback();
 }
 
 void ASAPlayableCharacter::Landed(const FHitResult& Hit)
@@ -168,17 +188,40 @@ void ASAPlayableCharacter::BeginPlay()
 
 }
 
-void ASAPlayableCharacter::OnRep_AbilitySystemComponent()
-{
-	InventoryComponent->InitInventory(AbilitySystemComponent);
-}
-
 void ASAPlayableCharacter::InitAbilityActorInfo()
 {
 	ASAPlayerState* PS = GetPlayerStateChecked<ASAPlayerState>();
 	PS->GetAbilitySystemComponent()->InitAbilityActorInfo(PS, this);
 	AbilitySystemComponent = PS->GetAbilitySystemComponent();
 	AttributeSet = PS->GetAttributeSet();
+}
+
+void ASAPlayableCharacter::BindEventCallback()
+{
+	const FSAGameplayTags& GameplayTags = FSAGameplayTags::Get();
+	AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Locomotion_Crouch).AddUObject(this, &ASAPlayableCharacter::StanceEventCallback);
+	AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Locomotion_Stand).AddUObject(this, &ASAPlayableCharacter::StanceEventCallback);
+	AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Locomotion_Prone).AddUObject(this, &ASAPlayableCharacter::StanceEventCallback);
+}
+
+void ASAPlayableCharacter::StanceEventCallback(const FGameplayEventData* Payload)
+{
+	const FSAGameplayTags& GameplayTags = FSAGameplayTags::Get();
+	FGameplayTagContainer OwingTags;
+	AbilitySystemComponent->GetOwnedGameplayTags(OwingTags);
+
+	if (OwingTags.HasTag(GameplayTags.State_Stance_Crouch))
+	{
+		SetCharacterStance(ECharacterStance::Crouch);
+	}
+	else if (OwingTags.HasTag(GameplayTags.State_Stance_Prone))
+	{
+		SetCharacterStance(ECharacterStance::Prone);
+	}
+	else
+	{
+		SetCharacterStance(ECharacterStance::Stand);		
+	}
 }
 
 void ASAPlayableCharacter::AbilityStart(const FGameplayTag& InputTag)

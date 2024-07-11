@@ -27,7 +27,9 @@ public:
 	virtual void MoveCommand(FVector2D Value) = 0;
 	virtual void LookCommand(FVector2D Value) = 0;
 
-	virtual void JumpCommand(bool Value) = 0;
+	virtual void CrouchCommand() = 0;
+	virtual void ProneCommand() = 0;
 
+	virtual void JumpCommand(bool Value) = 0;
 	virtual void InteractCommand(bool Value) = 0;
 };

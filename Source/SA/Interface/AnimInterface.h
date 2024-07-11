@@ -39,4 +39,5 @@ public:
 	virtual bool IsAccelerating() const = 0;
 	virtual bool IsAiming() const = 0;
 	virtual bool ShouldUseIK() const = 0;
+	virtual bool IsAnyMontagePlaying() const = 0;
 };

@@ -31,4 +31,6 @@ protected:
 		TArray<TSubclassOf<UGameplayEffect>> OngoingEffectsToJustApplyOnStart;
 
 	TArray<FActiveGameplayEffectHandle> RemoveOnEndEffectHandles;
+
+
 };

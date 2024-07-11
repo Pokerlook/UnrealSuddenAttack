@@ -58,6 +58,10 @@ public:
 		StateTags
 	*/
 	FGameplayTag State_InAir_Jumping;
+	FGameplayTag State_Stance_Crouch;
+	FGameplayTag State_Stance_Prone;
+	FGameplayTag State_Movement_Sprint;
+	FGameplayTag State_Movement_Sneek;
 	/*
 		StateTags
 	*/
@@ -95,6 +99,9 @@ public:
 	FGameplayTag Event_Inventory_EquipItem;
 	FGameplayTag Event_Inventory_DropItem;
 	FGameplayTag Event_Inventory_UnequipItem;
+	FGameplayTag Event_Locomotion_Stand;
+	FGameplayTag Event_Locomotion_Crouch;
+	FGameplayTag Event_Locomotion_Prone;
 	/*
 		EventTags
 	*/

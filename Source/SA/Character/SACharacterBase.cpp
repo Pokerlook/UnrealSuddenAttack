@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Components/CapsuleComponent.h"
+#include "Animation/AnimInstance.h"
 
 // Sets default values
 ASACharacterBase::ASACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -98,6 +99,28 @@ bool ASACharacterBase::ShouldUseIK() const
     // reload, change weapon, death는 tag로. 체크.
 
     return true;
+}
+
+bool ASACharacterBase::IsAnyMontagePlaying() const
+{
+    // 애니메이션 인스턴스를 가져옵니다.
+    UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+    // 애니메이션 인스턴스가 유효한지 확인합니다.
+    if (AnimInstance)
+    {
+
+        // 몽타주가 재생 중인지 확인합니다.
+        if (AnimInstance->IsAnyMontagePlaying())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    return false;
 }
 
 ECharacterStance ASACharacterBase::GetStance() const
@@ -221,6 +244,11 @@ void ASACharacterBase::TurnInPlace(float DeltaTime)
             StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
         }
     }
+}
+
+void ASACharacterBase::SetCharacterStance(ECharacterStance ToStance)
+{
+    CharacterStance = ToStance;
 }
 
 void ASACharacterBase::ClientSetYaw_Implementation(float NewYaw)
