@@ -33,6 +33,7 @@ bool UGA_Crouch::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 	}
 
 	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
+	if (Character->bIsCrouched) return true;
 	return Character->CanCrouch();
 }
 
@@ -61,5 +62,4 @@ void UGA_Crouch::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 		StandToCrouch(Character);
 	}
 
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }

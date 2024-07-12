@@ -88,7 +88,10 @@ private:
 	float Pitch;
 	FRotator StartingAimRotation;
 
+	UPROPERTY(Replicated)
 	ECharacterStance CharacterStance = ECharacterStance::Stand;
+	UFUNCTION(Client, Reliable)
+		void ClientSetCharacterStance(ECharacterStance ToStance);
 
 	UPROPERTY(BlueprintReadWrite, Category = Test, meta = (AllowPrivateAccess = "true")) // 나중에 bp에 노출 안할 거
 		bool bIsAiming = false;

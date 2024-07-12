@@ -17,12 +17,11 @@
 # 인벤토리... 아이템 배열... 구조체 저장. 구조체에 클래스ref 있어서 필요하면 spawn..
 ffastarrayserializer item
 
-# crouch, prone 어빌리티 구현 할 때 anim인터페이스로 stance 셋.. CharacterStance도 replicate 해야하나? 어빌리티에서 바꿀거니까 ㄱㅊ은가?
-
 # 캐릭터base에 bUseFABRIK을 replicate 해야하나? bAiming도 replicate 해야하나? 재장전/aiming 구현할 때 한번 보자.
 
 # 모든 무기엔 LeftHandSocket 소켓이 있어야 한다.
--> 양손 각각 따로 무기 하나씩 쥐고 싶을 때? 무기에 should use left hand IK 함수 만들까?
+-> 양손 각각 따로 무기 하나씩 쥐고 싶을 때? 무기에 should use left hand IK 함수 만들까? 일단 나중에 생각...
 
-rifle_stand_jump_end 너무 긴데. 0.8초... 0.2초 정도로 압축? 어떻게?
+# fullbody 몽타주 실행중엔 이동 불가
 
+# GA crouch, prone 에서 can activate 할 때 상황봐서 못하면 ui메세지 보여주기.... 

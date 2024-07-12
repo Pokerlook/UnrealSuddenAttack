@@ -19,6 +19,8 @@ ASACharacterBase::ASACharacterBase(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 
     bReplicates = true;
+    NetUpdateFrequency = 66.f;
+    MinNetUpdateFrequency = 33.f;
 }
 
 float ASACharacterBase::GetSpeed() const
@@ -155,6 +157,7 @@ void ASACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
     DOREPLIFETIME(ASACharacterBase, Yaw);
     DOREPLIFETIME(ASACharacterBase, TurningInPlace);
     DOREPLIFETIME(ASACharacterBase, AbilitySystemComponent);
+    DOREPLIFETIME(ASACharacterBase, CharacterStance);
 }
 
 // Called when the game starts or when spawned
@@ -248,7 +251,11 @@ void ASACharacterBase::TurnInPlace(float DeltaTime)
 
 void ASACharacterBase::SetCharacterStance(ECharacterStance ToStance)
 {
-    CharacterStance = ToStance;
+    if (HasAuthority())
+    {
+        CharacterStance = ToStance;
+        ClientSetCharacterStance(ToStance);
+    }
 }
 
 void ASACharacterBase::ClientSetYaw_Implementation(float NewYaw)
@@ -264,6 +271,11 @@ void ASACharacterBase::SetYaw(float NewYaw)
         // 서버에서 클라이언트로 RPC 호출하여 Yaw 값을 전달
         ClientSetYaw(NewYaw);
     }
+}
+
+void ASACharacterBase::ClientSetCharacterStance_Implementation(ECharacterStance ToStance)
+{
+    CharacterStance = ToStance;
 }
 
 void ASACharacterBase::ClientSetTIP_Implementation(ETurningInPlace NewTIP)

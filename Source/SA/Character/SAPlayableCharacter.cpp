@@ -26,6 +26,7 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCharacterMovement()->CrouchedHalfHeight = 45.f;
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
@@ -222,6 +223,7 @@ void ASAPlayableCharacter::StanceEventCallback(const FGameplayEventData* Payload
 	{
 		SetCharacterStance(ECharacterStance::Stand);		
 	}
+	
 }
 
 void ASAPlayableCharacter::AbilityStart(const FGameplayTag& InputTag)
