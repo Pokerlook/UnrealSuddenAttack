@@ -41,18 +41,69 @@ public:
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	//UFUNCTION(BlueprintCallable)
+	//	void Prone();
+	//UFUNCTION(BlueprintCallable)
+	//	void UnProne();
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Movement) 
+		class USACharacterMovementComponent* SACharacterMovementComponent;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+		class USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float CapsuleHeightStand;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float CapsuleHeightProne;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float MeshZLocationStand;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float MeshZLocationProne;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float CameraZLocationStand;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float CameraZLocationCrouch;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		float CameraZLocationProne;
 
 	virtual void BeginPlay() override;
 
 	virtual void OnRep_AbilitySystemComponent() override;
-private:	
 
-	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class USpringArmComponent* CameraBoom;
+	UFUNCTION(BlueprintImplementableEvent, Category = "Custom")
+		void AtProne();	// set prone capsule rotation & location, main capsule size, mesh location
+	UFUNCTION(BlueprintImplementableEvent, Category = "Custom")
+		void AtCrouch(); // set prone capsule rotation & location, main capsule size, mesh location
+	UFUNCTION(BlueprintImplementableEvent, Category = "Custom")
+		void AtStand(); // set prone capsule rotation & location, main capsule size, mesh location
+private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(EditAnywhere, Replicated)
+		class USAInventoryComponent* InventoryComponent;	// 인벤토리 인터페이스나 Getter가 필요할 수도
+
+	TScriptInterface<IInteractInterface> ThisInteract;
+	TScriptInterface<IInteractInterface> LastInteract;
+	bool isInteracting = false;
+
+
+	float NowMaxSpeed;
+	float NowMaxBackSpeed;
+
+	UPROPERTY(EditDefaultsOnly)float MaxWalkSpeed;
+	UPROPERTY(EditDefaultsOnly)float MaxWalkSpeed_Back;
+
+	UPROPERTY(EditDefaultsOnly)float MaxSprintSpeed;
+	UPROPERTY(EditDefaultsOnly)float MaxSprintSpeed_Back;
+
+	UPROPERTY(EditDefaultsOnly)float MaxSneekSpeed;
+	UPROPERTY(EditDefaultsOnly)float MaxSneekSpeed_Back;
 
 	void InitAbilityActorInfo();
 	void BindEventCallback();
@@ -60,15 +111,6 @@ private:
 
 	void AbilityStart(const FGameplayTag& InputTag);
 	void AbilityEnd(const FGameplayTag& InputTag);
-
-	UPROPERTY(EditAnywhere, Replicated)
-	class USAInventoryComponent* InventoryComponent;	// 인벤토리 인터페이스나 Getter가 필요할 수도
-
-	TScriptInterface<IInteractInterface> ThisInteract;
-	TScriptInterface<IInteractInterface> LastInteract;
-	bool isInteracting = false;
-
-	//UFUNCTION() void OnRep_Interact();//TScriptInterface<IInteractInterface> ThisInteract
 
 	void CheckInteractInterface();
 

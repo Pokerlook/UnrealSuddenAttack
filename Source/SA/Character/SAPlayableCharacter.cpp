@@ -6,6 +6,7 @@
 #include "SA/SATagSingleton.h"
 #include "SA/Component/SAInventoryComponent.h"
 #include "SA/Interface/InteractInterface.h"
+#include "SA/Component/SACharacterMovementComponent.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -14,10 +15,14 @@
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
+	SACharacterMovementComponent = Cast<USACharacterMovementComponent>(GetCharacterMovement());
+
 	// Configure character movement	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -26,7 +31,7 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
-	GetCharacterMovement()->CrouchedHalfHeight = 45.f;
+	GetCharacterMovement()->CrouchedHalfHeight = 70.f;
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
@@ -40,6 +45,10 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 
 	InventoryComponent = CreateDefaultSubobject<USAInventoryComponent>(TEXT("Inventory"));
 	InventoryComponent->SetIsReplicated(true);
+
+	GetCapsuleComponent()->SetCapsuleHalfHeight(95.f);
+	GetCapsuleComponent()->SetCapsuleRadius(20.f);
+
 }
 
 EWeaponType ASAPlayableCharacter::GetEquippedWeaponType() const
@@ -60,12 +69,13 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	// get right vector 
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
+	// check is go front or not. check is sneek, walk, or sprint.
+
+	// smooth speed...
+
 	// add movement 
 	AddMovementInput(ForwardDirection, Value.Y);
 	AddMovementInput(RightDirection, Value.X);
-	
-
-
 }
 
 void ASAPlayableCharacter::LookCommand(FVector2D Value)
@@ -83,11 +93,12 @@ void ASAPlayableCharacter::JumpCommand(bool Value)
 {
 	if (Value)
 	{
-		// Later, should check crouch and prone, return to stand.
-		// if stand, normal jump
-		const FGameplayTag JumpTag = FSAGameplayTags::Get().InputTag_Jump;
-		AbilityStart(JumpTag);
-		//UE_LOG(LogTemp, Warning, TEXT("JumpAbility TryActivateAbility"));
+		if (AbilitySystemComponent->HasMatchingGameplayTag(FSAGameplayTags::Get().State_Stance_Crouch)
+			|| AbilitySystemComponent->HasMatchingGameplayTag(FSAGameplayTags::Get().State_Stance_Prone))
+		{
+			return;
+		}
+		AbilityStart(FSAGameplayTags::Get().InputTag_Jump);
 	}
 	else
 	{
@@ -117,7 +128,6 @@ void ASAPlayableCharacter::CrouchCommand()
 {
 	const FGameplayTag CrouchTag = FSAGameplayTags::Get().InputTag_Crouch;
 	AbilityStart(CrouchTag);
-	UE_LOG(LogTemp, Warning, TEXT("PCharacter :: Crouch"));
 }
 
 void ASAPlayableCharacter::ProneCommand()
@@ -187,6 +197,9 @@ void ASAPlayableCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	CapsuleHeightStand = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	MeshZLocationStand = GetMesh()->GetRelativeLocation().Z;
+	CameraZLocationStand = CameraBoom->GetRelativeLocation().Z;
 }
 
 void ASAPlayableCharacter::InitAbilityActorInfo()
@@ -214,14 +227,28 @@ void ASAPlayableCharacter::StanceEventCallback(const FGameplayEventData* Payload
 	if (OwingTags.HasTag(GameplayTags.State_Stance_Crouch))
 	{
 		SetCharacterStance(ECharacterStance::Crouch);
+
+		AtCrouch();
+
+		// change movement's max walk speed
 	}
 	else if (OwingTags.HasTag(GameplayTags.State_Stance_Prone))
 	{
 		SetCharacterStance(ECharacterStance::Prone);
+		// set capsule
+		
+		AtProne();
+
+		// change movement's max walk speed
 	}
 	else
 	{
-		SetCharacterStance(ECharacterStance::Stand);		
+		SetCharacterStance(ECharacterStance::Stand);
+		// set capsule
+
+		AtStand();
+ 
+		// change movement's max walk speed
 	}
 	
 }
