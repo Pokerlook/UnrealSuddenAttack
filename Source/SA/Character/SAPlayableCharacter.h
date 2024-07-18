@@ -10,6 +10,9 @@
 #include "SAPlayableCharacter.generated.h"
 
 class IInteractInterface;
+class USACharacterMovementComponent;
+class USpringArmComponent;
+class UCameraComponent;
 
 /**
  * 
@@ -45,13 +48,16 @@ public:
 	//	void Prone();
 	//UFUNCTION(BlueprintCallable)
 	//	void UnProne();
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE USACharacterMovementComponent* GetSACharacterMovement() const { return SACharacterMovementComponent; }
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Movement) 
-		class USACharacterMovementComponent* SACharacterMovementComponent;
+		USACharacterMovementComponent* SACharacterMovementComponent;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-		class USpringArmComponent* CameraBoom;
+		USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float CapsuleHeightStand;
@@ -83,7 +89,7 @@ protected:
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
-	class UCameraComponent* FollowCamera;
+	UCameraComponent* FollowCamera;
 
 	UPROPERTY(EditAnywhere, Replicated)
 		class USAInventoryComponent* InventoryComponent;	// 인벤토리 인터페이스나 Getter가 필요할 수도

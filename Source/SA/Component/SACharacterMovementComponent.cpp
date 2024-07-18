@@ -6,6 +6,7 @@
 
 USACharacterMovementComponent::USACharacterMovementComponent()
 {
+	NavAgentProps.bCanCrouch = true;
 }
 
 USACharacterMovementComponent::FSavedMove_SA::FSavedMove_SA()
