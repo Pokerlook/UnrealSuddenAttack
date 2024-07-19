@@ -50,7 +50,10 @@ public:
 	//	void UnProne();
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-	FORCEINLINE USACharacterMovementComponent* GetSACharacterMovement() const { return SACharacterMovementComponent; }
+	UFUNCTION(BlueprintPure) FORCEINLINE USACharacterMovementComponent* GetSACharacterMovement() const { return SACharacterMovementComponent; }
+
+	FCollisionQueryParams GetIgnoreCharacterParams() const;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Movement) 
 		USACharacterMovementComponent* SACharacterMovementComponent;

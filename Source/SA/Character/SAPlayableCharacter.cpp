@@ -192,6 +192,19 @@ void ASAPlayableCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ASAPlayableCharacter, InventoryComponent);
 }
 
+FCollisionQueryParams ASAPlayableCharacter::GetIgnoreCharacterParams() const
+{
+	FCollisionQueryParams Params;
+
+	TArray<AActor*> CharacterChildren;
+
+	GetAllChildActors(CharacterChildren);
+	Params.AddIgnoredActors(CharacterChildren);
+	Params.AddIgnoredActor(this);
+
+	return Params;
+}
+
 void ASAPlayableCharacter::BeginPlay()
 {
 	Super::BeginPlay();
