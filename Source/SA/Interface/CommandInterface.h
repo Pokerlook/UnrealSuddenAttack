@@ -32,4 +32,5 @@ public:
 
 	virtual void JumpCommand(bool Value) = 0;
 	virtual void InteractCommand(bool Value) = 0;
+	virtual void SprintCommand(bool Value) = 0;
 };

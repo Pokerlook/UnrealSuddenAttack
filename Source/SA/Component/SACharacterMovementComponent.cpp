@@ -45,7 +45,7 @@ void USACharacterMovementComponent::FSavedMove_SA::SetMoveFor(ACharacter* C, flo
 
 	USACharacterMovementComponent* CharacterMovement = Cast<USACharacterMovementComponent>(C->GetCharacterMovement());
 
-	Saved_bPrevWantsToCrouch = CharacterMovement->Safe_bPrevWantsToCrouch;
+	Saved_bWantsToSlide = CharacterMovement->Safe_bWantsToSlide;
 }
 
 void USACharacterMovementComponent::FSavedMove_SA::PrepMoveFor(ACharacter* C)
@@ -55,7 +55,7 @@ void USACharacterMovementComponent::FSavedMove_SA::PrepMoveFor(ACharacter* C)
 
 	USACharacterMovementComponent* CharacterMovement = Cast<USACharacterMovementComponent>(C->GetCharacterMovement());
 
-	CharacterMovement->Safe_bPrevWantsToCrouch = Saved_bPrevWantsToCrouch;
+	CharacterMovement->Safe_bWantsToSlide = Saved_bWantsToSlide;
 }
 
 USACharacterMovementComponent::FNetworkPredictionData_Client_SA::FNetworkPredictionData_Client_SA(const UCharacterMovementComponent& ClientMovement)
@@ -98,6 +98,16 @@ bool USACharacterMovementComponent::IsCustomMovementMode(ECustomMovementMode InC
 	return MovementMode==MOVE_Custom && CustomMovementMode==InCustomMovementMode;
 }
 
+void USACharacterMovementComponent::Slide()
+{
+	Safe_bWantsToSlide = true;
+}
+
+void USACharacterMovementComponent::UnSlide()
+{
+	Safe_bWantsToSlide = false;
+}
+
 void USACharacterMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
@@ -110,18 +120,22 @@ void USACharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 
 void USACharacterMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
 {
-	if (MovementMode == MOVE_Walking && !bWantsToCrouch && Safe_bPrevWantsToCrouch)
+	if (MovementMode == MOVE_Walking && !bWantsToCrouch && Safe_bWantsToSlide)
 	{
 		FHitResult PotentialSlideSurface;
-		if (Velocity.SizeSquared() > pow(Slide_MinSpeed, 2) && GetSlideSurface(PotentialSlideSurface))
+		if (Velocity.SizeSquared() > pow(MinSlideSpeed, 2) && GetSlideSurface(PotentialSlideSurface))
 		{
 			Safe_EnterSlide();
 		}
+		else
+		{
+			Safe_bWantsToSlide = false;
+		}
 	}
 
-	if (IsCustomMovementMode(CMOVE_Slide) && !bWantsToCrouch)	// slide중에 crouch 해제
+	if (IsCustomMovementMode(CMOVE_Slide) && !Safe_bWantsToSlide)	// slide중에 crouch 해제
 	{
-		//Safe_ExitSlide();
+		Safe_ExitSlide();
 		SetMovementMode(MOVE_Walking);
 	}
 	//crouch 업데이트 되기 전에 slide 업데이트
@@ -133,7 +147,6 @@ void USACharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const 
 {
 	Super::OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
 
-	Safe_bPrevWantsToCrouch = bWantsToCrouch;
 }
 
 void USACharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
@@ -153,7 +166,8 @@ void USACharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
 void USACharacterMovementComponent::Safe_EnterSlide()
 {
 	bWantsToCrouch = true;	// 캡슐 줄일거임
-	Velocity += Velocity.GetSafeNormal2D() * Slide_EnterImpulse;
+
+	Velocity += Velocity.GetSafeNormal2D() * SlideEnterImpulse;
 	SetMovementMode(MOVE_Custom, CMOVE_Slide);
 
 	UE_LOG(LogTemp, Warning, TEXT("Slide Start"));
@@ -162,6 +176,9 @@ void USACharacterMovementComponent::Safe_EnterSlide()
 void USACharacterMovementComponent::Safe_ExitSlide()
 {
 	bWantsToCrouch = false;
+
+
+	Safe_bWantsToSlide = false;
 
 	FQuat NewRotation = FRotationMatrix::MakeFromXZ(UpdatedComponent->GetForwardVector().GetSafeNormal2D(), FVector::UpVector).ToQuat();
 	FHitResult Hit;
@@ -182,7 +199,7 @@ void USACharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
 	// slide는 루트모션 안 쓸거라 RestorePreAdditiveRootMotionVelocity 관련해서 루트모션 함수 안 써도 되기는 하는데 그냥 둠
 
 	FHitResult SurfaceHit;
-	if (!GetSlideSurface(SurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed, 2))
+	if (!GetSlideSurface(SurfaceHit) || Velocity.SizeSquared() < pow(MinSlideSpeed, 2))
 	{
 		Safe_ExitSlide();
 		StartNewPhysics(deltaTime, Iterations);	// slide 끝나기 때문에 다른 Phys를 사용한다
@@ -190,7 +207,7 @@ void USACharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
 	}
 
 	// Surface Gravity
-	Velocity += Slide_GravityForce * FVector::DownVector * deltaTime; // v += a * dt
+	Velocity += SlideGravityForce * FVector::DownVector * deltaTime; // v += a * dt
 
 	// Strafe
 	if (FMath::Abs(FVector::DotProduct(Acceleration.GetSafeNormal(), UpdatedComponent->GetRightVector())) > .5)
@@ -228,7 +245,7 @@ void USACharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
 	}
 
 	FHitResult NewSurfaceHit;
-	if (!GetSlideSurface(NewSurfaceHit) || Velocity.SizeSquared() < pow(Slide_MinSpeed, 2))
+	if (!GetSlideSurface(NewSurfaceHit) || Velocity.SizeSquared() < pow(MinSlideSpeed, 2))
 	{
 		Safe_ExitSlide();
 	}
@@ -246,4 +263,14 @@ bool USACharacterMovementComponent::GetSlideSurface(FHitResult& Hit) const
 	FVector End = Start + CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f * FVector::DownVector;
 	FName ProfileName = TEXT("BlockAll");
 	return GetWorld()->LineTraceSingleByProfile(Hit, Start, End, ProfileName, SACharacterOwner->GetIgnoreCharacterParams());
+}
+
+bool USACharacterMovementComponent::CanSlide() const
+{
+	FVector Start = UpdatedComponent->GetComponentLocation();
+	FVector End = Start + CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.5f * FVector::DownVector;
+	FName ProfileName = TEXT("BlockAll");
+	bool bValidSurface = GetWorld()->LineTraceTestByProfile(Start, End, ProfileName, SACharacterOwner->GetIgnoreCharacterParams());
+	bool bEnoughSpeed = Velocity.SizeSquared() > pow(MinSlideSpeed, 2);
+	return bValidSurface && bEnoughSpeed;
 }

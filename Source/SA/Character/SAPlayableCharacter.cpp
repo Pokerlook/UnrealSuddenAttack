@@ -47,7 +47,7 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(95.f);
 	GetCapsuleComponent()->SetCapsuleRadius(20.f);
-
+	GetCapsuleComponent()->SetSimulatePhysics(true);
 }
 
 EWeaponType ASAPlayableCharacter::GetEquippedWeaponType() const
@@ -121,6 +121,11 @@ void ASAPlayableCharacter::InteractCommand(bool Value)
 		UE_LOG(LogTemp, Warning, TEXT("%s : InteractStart "), *ThisInteract.GetObject()->GetName());
 		isInteracting = true;
 	}
+}
+
+void ASAPlayableCharacter::SprintCommand(bool Value)
+{
+	SACharacterMovementComponent->Slide();
 }
 
 void ASAPlayableCharacter::CrouchCommand()
@@ -209,9 +214,8 @@ void ASAPlayableCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CapsuleHeightStand = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
-	MeshZLocationStand = GetMesh()->GetRelativeLocation().Z;
-	CameraZLocationStand = CameraBoom->GetRelativeLocation().Z;
+	GetCapsuleComponent()->SetSimulatePhysics(false);
+
 }
 
 void ASAPlayableCharacter::InitAbilityActorInfo()

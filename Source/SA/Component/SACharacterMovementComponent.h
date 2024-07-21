@@ -40,7 +40,7 @@ class SA_API USACharacterMovementComponent : public UCharacterMovementComponent
 		// uint8 Saved_bWantsToSprint:1; but I will sprint with GAS
 
 		// Other Variables, not rep
-		uint8 Saved_bPrevWantsToCrouch : 1;
+		uint8 Saved_bWantsToSlide : 1;
 
 		FSavedMove_SA();
 
@@ -61,14 +61,18 @@ class SA_API USACharacterMovementComponent : public UCharacterMovementComponent
 	};
 
 	// Parameters
-	UPROPERTY(EditDefaultsOnly) float Slide_MinSpeed = 400;
-	UPROPERTY(EditDefaultsOnly) float Slide_EnterImpulse = 400;
-	UPROPERTY(EditDefaultsOnly) float Slide_GravityForce = 200;
-	UPROPERTY(EditDefaultsOnly) float Slide_Friction = .1;
+	UPROPERTY(EditDefaultsOnly) float MinSlideSpeed = 400;
+	UPROPERTY(EditDefaultsOnly) float MaxSlideSpeed = 400.f;
+	UPROPERTY(EditDefaultsOnly) float SlideEnterImpulse = 400;
+	UPROPERTY(EditDefaultsOnly) float SlideGravityForce = 200;
+	UPROPERTY(EditDefaultsOnly) float Slide_Friction = .2;
+	UPROPERTY(EditDefaultsOnly) float BrakingDecelerationSliding = 1000.f;
 
 	// Transient
 	UPROPERTY(Transient) class ASAPlayableCharacter*SACharacterOwner;
-	bool Safe_bPrevWantsToCrouch;
+//	bool Safe_bPrevWantsToCrouch;
+	bool Safe_bWantsToSlide;
+
 
 public:
 	USACharacterMovementComponent();
@@ -80,7 +84,8 @@ public:
 
 	UFUNCTION(BlueprintPure) bool IsCustomMovementMode(ECustomMovementMode InCustomMovementMode) const;
 
-	void Silde();
+	void Slide();
+	void UnSlide();
 
 protected:
 	virtual void InitializeComponent() override;
@@ -95,5 +100,6 @@ private:
 	void Safe_ExitSlide();
 	void PhysSlide(float deltaTime, int32 Iterations);
 	bool GetSlideSurface(FHitResult& Hit) const;
+	bool CanSlide() const;
 
 };

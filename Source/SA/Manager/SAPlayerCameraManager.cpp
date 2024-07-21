@@ -33,9 +33,6 @@ void ASAPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTi
 			CrouchBlendTime = FMath::Clamp(CrouchBlendTime - DeltaTime, 0.f, CrouchBlendDuration);
 		}
 
-		if (SMC->IsMovingOnGround())
-		{
-			OutVT.POV.Location += Offset;
-		}
+		OutVT.POV.Location += Offset;
 	}
 }

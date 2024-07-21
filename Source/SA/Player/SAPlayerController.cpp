@@ -159,7 +159,8 @@ void ASAPlayerController::Sprint(const FInputActionValue& Value)
 {
 	if (!CharacterCommand) return;
 	bool bValue = Value.Get<bool>();
-	UE_LOG(LogTemp, Warning, TEXT("left shift Sprint %d"), bValue);
+//	UE_LOG(LogTemp, Warning, TEXT("left shift Sprint %d"), bValue);
+	CharacterCommand->SprintCommand(bValue);
 }
 
 void ASAPlayerController::Fire(const FInputActionValue& Value)

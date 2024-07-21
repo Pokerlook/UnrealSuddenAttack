@@ -30,6 +30,7 @@ public:
 	virtual void LookCommand(FVector2D Value) override;
 	virtual void JumpCommand(bool Value) override;
 	virtual void InteractCommand(bool Value) override;
+	virtual void SprintCommand(bool Value) override;
 	virtual void CrouchCommand() override;
 	virtual void ProneCommand() override;
 	// command
@@ -57,27 +58,11 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Movement) 
 		USACharacterMovementComponent* SACharacterMovementComponent;
-
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	//	class UBoxComponent* ProneCollision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 		USpringArmComponent* CameraBoom;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float CapsuleHeightStand;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float CapsuleHeightProne;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float MeshZLocationStand;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float MeshZLocationProne;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float CameraZLocationStand;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float CameraZLocationCrouch;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		float CameraZLocationProne;
 
 	virtual void BeginPlay() override;
 
