@@ -30,7 +30,7 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->CrouchedHalfHeight = 70.f;
+	GetCharacterMovement()->SetCrouchedHalfHeight(70.f);
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
@@ -68,14 +68,95 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	// get right vector 
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	// check is go front or not. check is sneek, walk, or sprint.
+	// check is go front or not. check is sneek, walk, or sprint. change max speed.
 
-	// smooth speed...
+	if (!bIsProned)
+	{
+		// add movement 
+		AddMovementInput(ForwardDirection, Value.Y);
+		AddMovementInput(RightDirection, Value.X);
+		return;
+	}
+
+	const FSAGameplayTags& GameplayTags = FSAGameplayTags::Get();
+	FGameplayTagContainer OwingTags;
+	AbilitySystemComponent->GetOwnedGameplayTags(OwingTags);
+	if (!OwingTags.HasTag(GameplayTags.State_Stance_Prone))
+	{
+		UE_LOG(LogTemp, Error, TEXT("bIsProne is True, but no State_Stance_Prone tag"));
+		return;
+	}
+
+	// if prone, check ray trace
+	if (Value.Y > 0) // go front
+	{
+
+		FVector ForwardVector = GetActorForwardVector();
+		FVector End = GetActorLocation() + (ForwardVector * (StandHeight + 1));
+		if (!CanProneMove(End))
+		{
+			ProneCommand();
+			return;
+		}
+	}
+	else if(Value.Y < 0)// go back
+	{
+		FVector ForwardVector = GetActorForwardVector();
+		FVector End = GetActorLocation() - (ForwardVector * (StandHeight + 1));
+		if (!CanProneMove(End))
+		{
+			ProneCommand();
+			return;
+		}
+	}
+
+	if (Value.X > 0) // go right
+	{
+		FVector RightVector = GetActorRightVector();
+		FVector End = GetActorLocation() + (RightVector * (StandRadius + 1));
+		if (!CanProneMove(End))
+		{
+			ProneCommand();
+			return;
+		}
+	}
+	else if(Value.X < 0) // go left
+	{
+		FVector RightVector = GetActorRightVector();
+		FVector End = GetActorLocation() - (RightVector * (StandRadius + 1));
+		if (!CanProneMove(End))
+		{
+			ProneCommand();
+			return;
+		}
+	}
 
 	// add movement 
 	AddMovementInput(ForwardDirection, Value.Y);
 	AddMovementInput(RightDirection, Value.X);
 }
+
+bool ASAPlayableCharacter::CanProneMove(FVector End)
+{
+	FVector Start = GetActorLocation();
+
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams = GetIgnoreCharacterParams();
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult,          // 결과를 저장할 HitResult
+		Start,              // 시작 지점
+		End,                // 끝 지점
+		ECC_Pawn,           // 충돌 채널
+		CollisionParams     // 충돌 파라미터
+	);
+#if WITH_EDITOR
+	FColor LineColor = bHit ? FColor::Red : FColor::Green;
+	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 1.0f, 0, 1.0f);
+#endif
+	return !bHit;	// 부딪힌게 없다 -> 움직일 수 있다
+}
+
 
 void ASAPlayableCharacter::LookCommand(FVector2D Value)
 {
@@ -145,11 +226,49 @@ FTransform ASAPlayableCharacter::GetWeaponLeftHandSocketTransform() const
 	return InventoryComponent->GetWeaponLeftHandSocketTransform();
 }
 
+FCollisionQueryParams ASAPlayableCharacter::GetIgnoreCharacterParams() const
+{
+	FCollisionQueryParams Params;
+
+	TArray<AActor*> CharacterChildren;
+
+	GetAllChildActors(CharacterChildren);
+	Params.AddIgnoredActors(CharacterChildren);
+	Params.AddIgnoredActor(this);
+
+	return Params;
+}
+
 void ASAPlayableCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	CheckInteractInterface();
+
+	if (!bIsProned) return;
+	FVector Start = GetActorLocation();
+	FVector End = Start - FVector(0.0f, 0.0f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight()*2); // Adjust the trace distance as needed
+	FHitResult HitResult;
+
+	FCollisionQueryParams Params = GetIgnoreCharacterParams();
+
+	// Perform a line trace (raycast) to detect the floor
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+
+	if (bHit)
+	{
+		FVector FloorNormal = HitResult.ImpactNormal;
+
+		// Calculate the new rotation
+		FRotator NewRotation = FRotationMatrix::MakeFromZX(FloorNormal, GetActorForwardVector()).Rotator();
+
+		// Optionally, preserve the yaw (rotation around Z axis)
+		NewRotation.Yaw = GetActorRotation().Yaw;
+
+		// Apply the new rotation
+		SetActorRotation(NewRotation);
+	}
+
 }
 
 void ASAPlayableCharacter::PossessedBy(AController* NewController)
@@ -195,19 +314,101 @@ void ASAPlayableCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ASAPlayableCharacter, InventoryComponent);
+	DOREPLIFETIME_CONDITION(ThisClass, bIsProned, COND_SimulatedOnly);
 }
 
-FCollisionQueryParams ASAPlayableCharacter::GetIgnoreCharacterParams() const
+void ASAPlayableCharacter::RecalculateBaseEyeHeight()
 {
-	FCollisionQueryParams Params;
+	if (bIsProned)
+	{
+		BaseEyeHeight = PronedEyeHeight;
+	}
+	else
+	{
+		Super::RecalculateBaseEyeHeight();
+	}
+}
 
-	TArray<AActor*> CharacterChildren;
+void ASAPlayableCharacter::Prone(bool bClientSimulation)
+{
+	if (SACharacterMovementComponent)
+	{
+		if (CanProne())
+		{
+			SACharacterMovementComponent->bWantsToProne = true;
+		}
+	}
+}
 
-	GetAllChildActors(CharacterChildren);
-	Params.AddIgnoredActors(CharacterChildren);
-	Params.AddIgnoredActor(this);
+void ASAPlayableCharacter::UnProne(bool bClientSimulation)
+{
+	if (SACharacterMovementComponent)
+	{
+		SACharacterMovementComponent->bWantsToProne = false;
+	}
+}
 
-	return Params;
+bool ASAPlayableCharacter::CanProne() const
+{
+	return !bIsProned && GetRootComponent() && !GetRootComponent()->IsSimulatingPhysics();
+}
+
+void ASAPlayableCharacter::OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	RecalculateBaseEyeHeight();
+
+	if (!bIsCrouched)
+	{
+		const ACharacter* DefaultChar = GetDefault<ACharacter>(GetClass());
+		if (GetMesh() && DefaultChar->GetMesh())
+		{
+			FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
+			MeshRelativeLocation.Z = DefaultChar->GetMesh()->GetRelativeLocation().Z;
+			BaseTranslationOffset.Z = MeshRelativeLocation.Z;
+		}
+		else
+		{
+			BaseTranslationOffset.Z = DefaultChar->GetBaseTranslationOffset().Z;
+		}
+	}
+	K2_OnEndProne(HalfHeightAdjust, ScaledHalfHeightAdjust);
+}
+
+void ASAPlayableCharacter::OnStartProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	RecalculateBaseEyeHeight();
+
+	const ACharacter* DefaultChar = GetDefault<ACharacter>(GetClass());
+	if (GetMesh() && DefaultChar->GetMesh())
+	{
+		FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
+		MeshRelativeLocation.Z = DefaultChar->GetMesh()->GetRelativeLocation().Z + HalfHeightAdjust;
+		BaseTranslationOffset.Z = MeshRelativeLocation.Z;
+	}
+	else
+	{
+		BaseTranslationOffset.Z = DefaultChar->GetBaseTranslationOffset().Z + HalfHeightAdjust;
+	}
+
+	K2_OnStartProne(HalfHeightAdjust, ScaledHalfHeightAdjust);
+}
+
+void ASAPlayableCharacter::OnRep_IsProned()
+{
+	if (SACharacterMovementComponent)
+	{
+		if (bIsProned)
+		{
+			SACharacterMovementComponent->bWantsToProne = true;
+			SACharacterMovementComponent->Prone(true);
+		}
+		else
+		{
+			SACharacterMovementComponent->bWantsToProne = false;
+			SACharacterMovementComponent->UnProne(true);
+		}
+		SACharacterMovementComponent->bNetworkUpdateReceived = true;
+	}
 }
 
 void ASAPlayableCharacter::BeginPlay()
@@ -216,6 +417,8 @@ void ASAPlayableCharacter::BeginPlay()
 
 	GetCapsuleComponent()->SetSimulatePhysics(false);
 
+	StandHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	StandRadius = GetCapsuleComponent()->GetScaledCapsuleRadius();
 }
 
 void ASAPlayableCharacter::InitAbilityActorInfo()
@@ -232,6 +435,7 @@ void ASAPlayableCharacter::BindEventCallback()
 	AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Locomotion_Crouch).AddUObject(this, &ASAPlayableCharacter::StanceEventCallback);
 	AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Locomotion_Stand).AddUObject(this, &ASAPlayableCharacter::StanceEventCallback);
 	AbilitySystemComponent->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Locomotion_Prone).AddUObject(this, &ASAPlayableCharacter::StanceEventCallback);
+
 }
 
 void ASAPlayableCharacter::StanceEventCallback(const FGameplayEventData* Payload)
@@ -244,8 +448,6 @@ void ASAPlayableCharacter::StanceEventCallback(const FGameplayEventData* Payload
 	{
 		SetCharacterStance(ECharacterStance::Crouch);
 
-		AtCrouch();
-
 		// change movement's max walk speed
 	}
 	else if (OwingTags.HasTag(GameplayTags.State_Stance_Prone))
@@ -253,17 +455,13 @@ void ASAPlayableCharacter::StanceEventCallback(const FGameplayEventData* Payload
 		SetCharacterStance(ECharacterStance::Prone);
 		// set capsule
 		
-		AtProne();
-
 		// change movement's max walk speed
 	}
 	else
 	{
 		SetCharacterStance(ECharacterStance::Stand);
 		// set capsule
-
-		AtStand();
- 
+		 
 		// change movement's max walk speed
 	}
 	

@@ -28,6 +28,7 @@ void USAInventoryComponent::InitInventory(UAbilitySystemComponent* ASC)
 	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_EquipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
 	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_DropItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
 	ASC->GenericGameplayEventCallbacks.FindOrAdd(GameplayTags.Event_Inventory_UnequipItem).AddUObject(this, &USAInventoryComponent::GameplayEventCallback);
+	ASC->RegisterGameplayTagEvent(GameplayTags.State_Stance_Prone, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &USAInventoryComponent::OnProneTagChanged);
 }
 
 EWeaponType USAInventoryComponent::GetWeaponType()
@@ -48,6 +49,11 @@ FTransform USAInventoryComponent::GetWeaponLeftHandSocketTransform() const
 	return LeftHandSocketTransform;
 }
 
+void USAInventoryComponent::UpdateWeaponSocket()
+{
+	
+}
+
 
 
 void USAInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -64,6 +70,19 @@ void USAInventoryComponent::BeginPlay()
 
 	// ...
 	
+}
+
+void USAInventoryComponent::OnProneTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	if (!IsValid(CurrentWeapon)) return;
+	if (NewCount > 0)
+	{
+		CurrentWeapon->UpdateWeaponSocket(true);
+	}
+	else
+	{
+		CurrentWeapon->UpdateWeaponSocket(false);
+	}
 }
 
 void USAInventoryComponent::GameplayEventCallback(const FGameplayEventData* Payload)

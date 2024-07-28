@@ -113,7 +113,7 @@ void ASAPlayerController::Move(const FInputActionValue& Value)
 	if (!CharacterCommand) return;
 	FVector2D MoveVector = Value.Get<FVector2D>();
 	CharacterCommand->MoveCommand(MoveVector);
-
+	UE_LOG(LogTemp, Display, TEXT("X %f / Y %f"), MoveVector.X, MoveVector.Y);;
 }
 
 void ASAPlayerController::Look(const FInputActionValue& Value)

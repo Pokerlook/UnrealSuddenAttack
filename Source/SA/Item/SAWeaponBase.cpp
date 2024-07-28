@@ -43,6 +43,28 @@ void ASAWeaponBase::Equip(AActor* InOwner)
 	HideInteractWidget();
 }
 
+void ASAWeaponBase::UpdateWeaponSocket(bool isProne)
+{
+	if (isProne)
+	{
+		ACharacter* Character = Cast<ACharacter>(GetOwner());
+		check(Character);
+		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(AttachmentSocketProne);
+		check(HandSocket);
+		this->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), AttachmentSocketProne);
+
+	}
+	else
+	{
+		ACharacter* Character = Cast<ACharacter>(GetOwner());
+		check(Character);
+		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(AttachmentSocket);
+		check(HandSocket);
+		this->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), AttachmentSocket);
+
+	}
+}
+
 EWeaponType ASAWeaponBase::GetWeaponType()
 {
 	return WeaponType;

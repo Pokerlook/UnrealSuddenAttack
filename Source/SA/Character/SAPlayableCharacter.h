@@ -24,6 +24,15 @@ class SA_API ASAPlayableCharacter : public ASACharacterBase, public ICommandInte
 public:
 	ASAPlayableCharacter(const FObjectInitializer& ObjectInitializer);
 
+	/** Set by character movement to specify that this Character is currently Proned. */
+	UPROPERTY(BlueprintReadOnly, replicatedUsing = OnRep_IsProned, Category = Character)
+		uint32 bIsProned : 1;
+
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	UFUNCTION(BlueprintPure) FORCEINLINE USACharacterMovementComponent* GetSACharacterMovement() const
+	{ return SACharacterMovementComponent; }
+
 	virtual EWeaponType GetEquippedWeaponType() const override;
 	// Command Interface
 	virtual void MoveCommand(FVector2D Value) override;
@@ -39,21 +48,53 @@ public:
 	virtual FTransform GetWeaponLeftHandSocketTransform() const override;
 	// anim
 
+	FCollisionQueryParams GetIgnoreCharacterParams() const;
+
 	virtual void Tick(float DeltaTime) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void RecalculateBaseEyeHeight() override;
 
-	//UFUNCTION(BlueprintCallable)
-	//	void Prone();
-	//UFUNCTION(BlueprintCallable)
-	//	void UnProne();
-	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-	UFUNCTION(BlueprintPure) FORCEINLINE USACharacterMovementComponent* GetSACharacterMovement() const { return SACharacterMovementComponent; }
+	/**
+	 * Request the character to start Proned. The request is processed on the next update of the CharacterMovementComponent.
+	 * @see OnStartProne
+	 * @see IsProned
+	 * @see CharacterMovement->WantsToProne
+	 */
+	UFUNCTION(BlueprintCallable, Category = Character, meta = (HidePin = "bClientSimulation"))
+		virtual void Prone(bool bClientSimulation = false);
 
-	FCollisionQueryParams GetIgnoreCharacterParams() const;
+	/**
+	 * Request the character to stop Proned. The request is processed on the next update of the CharacterMovementComponent.
+	 * @see OnEndProne
+	 * @see IsProned
+	 * @see CharacterMovement->WantsToProne
+	 */
+	UFUNCTION(BlueprintCallable, Category = Character, meta = (HidePin = "bClientSimulation"))
+		virtual void UnProne(bool bClientSimulation = false);
+
+	/** @return true if this character is currently able to Prone (and is not currently Proned) */
+	UFUNCTION(BlueprintCallable, Category = Character)
+		virtual bool CanProne() const;
+
+	/** Called when Character stops Proned. Called on non-owned Characters through bIsProned replication. */
+	virtual void OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
+
+	/** Event when Character stops Proned. */
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnEndProne", ScriptName = "OnEndProne"))
+		void K2_OnEndProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
+
+	/** Called when Character Pronees. Called on non-owned Characters through bIsProned replication. */
+	virtual void OnStartProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
+
+	/** Event when Character Pronees. */
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnStartProne", ScriptName = "OnStartProne"))
+		void K2_OnStartProne(float HalfHeightAdjust, float ScaledHalfHeightAdjust);
+	
+	UFUNCTION()
+		virtual void OnRep_IsProned();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Movement) 
@@ -68,12 +109,6 @@ protected:
 
 	virtual void OnRep_AbilitySystemComponent() override;
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Custom")
-		void AtProne();	// set prone capsule rotation & location, main capsule size, mesh location
-	UFUNCTION(BlueprintImplementableEvent, Category = "Custom")
-		void AtCrouch(); // set prone capsule rotation & location, main capsule size, mesh location
-	UFUNCTION(BlueprintImplementableEvent, Category = "Custom")
-		void AtStand(); // set prone capsule rotation & location, main capsule size, mesh location
 private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -85,7 +120,8 @@ private:
 	TScriptInterface<IInteractInterface> ThisInteract;
 	TScriptInterface<IInteractInterface> LastInteract;
 	bool isInteracting = false;
-
+	float StandHeight;
+	float StandRadius;
 
 	float NowMaxSpeed;
 	float NowMaxBackSpeed;
@@ -99,6 +135,8 @@ private:
 	UPROPERTY(EditDefaultsOnly)float MaxSneekSpeed;
 	UPROPERTY(EditDefaultsOnly)float MaxSneekSpeed_Back;
 
+	float PronedEyeHeight =30.f;
+
 	void InitAbilityActorInfo();
 	void BindEventCallback();
 	void StanceEventCallback(const FGameplayEventData* Payload);
@@ -108,4 +146,5 @@ private:
 
 	void CheckInteractInterface();
 
+	bool CanProneMove(FVector End);
 };

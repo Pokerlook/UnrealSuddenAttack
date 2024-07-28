@@ -22,6 +22,8 @@ public:
 	virtual void Equip(AActor* InOwner) override;
 	//equip
 
+	void UpdateWeaponSocket(bool isProne);
+
 	EWeaponType GetWeaponType();
 
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }

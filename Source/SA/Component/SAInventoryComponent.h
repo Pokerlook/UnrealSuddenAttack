@@ -20,6 +20,7 @@ public:
 	void InitInventory(UAbilitySystemComponent* ASC);
 	EWeaponType GetWeaponType();
 	virtual FTransform GetWeaponLeftHandSocketTransform() const;
+	void UpdateWeaponSocket();
 
 //	void ChangeWeaponWithItem(ASAWeaponBase* ToChangeWeapon); // inventory ui만들 때 필요
 //인벤토리에서 장착하면, 이벤트 받았을때랑 달리 이미 장착한 거라도 강제로 바꿈. 현재 unequip&destory. 이거 spawn&eqeuip
@@ -37,8 +38,8 @@ private:
 //	TArray<ASAWeaponBase> EquippingWeapons;
 	// equipment(헬멧,조끼,배낭?) 배열 변수 나중에 추가할 듯. map으로?
 
-
-	virtual void GameplayEventCallback(const FGameplayEventData* Payload);
+	void OnProneTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	void GameplayEventCallback(const FGameplayEventData* Payload);
 
 	void HandleGameplayEventInternal(FGameplayEventData Payload);
 	UFUNCTION(Server, Reliable)
