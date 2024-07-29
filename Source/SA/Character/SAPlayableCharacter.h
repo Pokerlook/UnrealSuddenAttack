@@ -56,6 +56,7 @@ public:
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void RecalculateBaseEyeHeight() override;
+	virtual void FaceRotation(FRotator ControlRotation, float DeltaTime) override;
 
 	/**
 	 * Request the character to start Proned. The request is processed on the next update of the CharacterMovementComponent.

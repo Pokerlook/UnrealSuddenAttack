@@ -12,6 +12,7 @@ USACharacterMovementComponent::USACharacterMovementComponent()
 	bCanWalkOffLedgesWhenProned = false;
 	bWantsToProne = false;
 	bProneLocked = false;
+	bCanWalkOffLedgesWhenCrouching = true;
 }
 
 USACharacterMovementComponent::FSavedMove_SA::FSavedMove_SA()

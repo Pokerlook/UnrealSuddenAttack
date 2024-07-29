@@ -48,7 +48,7 @@ ASAPlayableCharacter::ASAPlayableCharacter(const FObjectInitializer& ObjectIniti
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(95.f);
 	GetCapsuleComponent()->SetCapsuleRadius(20.f);
-	GetCapsuleComponent()->SetSimulatePhysics(true);
+
 }
 
 EWeaponType ASAPlayableCharacter::GetEquippedWeaponType() const
@@ -172,11 +172,6 @@ bool ASAPlayableCharacter::IsPathClear(FVector Start, FVector End)
 
 void ASAPlayableCharacter::LookCommand(FVector2D Value)
 {
-	//if (APlayerController* PC = Cast<APlayerController>(Controller))
-	//{		
-	//	PC->AddYawInput(Value.X);
-	//	PC->AddPitchInput(Value.Y);
-	//}
 	AddControllerYawInput(Value.X); 
 	AddControllerPitchInput(-Value.Y);
 }
@@ -341,6 +336,12 @@ void ASAPlayableCharacter::RecalculateBaseEyeHeight()
 	}
 }
 
+void ASAPlayableCharacter::FaceRotation(FRotator ControlRotation, float DeltaTime)
+{
+	Super::FaceRotation(ControlRotation, DeltaTime);
+
+}
+
 void ASAPlayableCharacter::Prone(bool bClientSimulation)
 {
 	if (SACharacterMovementComponent)
@@ -426,8 +427,6 @@ void ASAPlayableCharacter::OnRep_IsProned()
 void ASAPlayableCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetCapsuleComponent()->SetSimulatePhysics(false);
 
 	StandHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	StandRadius = GetCapsuleComponent()->GetScaledCapsuleRadius();
