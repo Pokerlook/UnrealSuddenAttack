@@ -7,6 +7,7 @@
 #include "SA/Component/SAInventoryComponent.h"
 #include "SA/Interface/InteractInterface.h"
 #include "SA/Component/SACharacterMovementComponent.h"
+#include "SA/SABlueprintFunctionLibrary.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -59,6 +60,12 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 {
 	if (Controller == nullptr) return;
 
+	if (USABlueprintFunctionLibrary::IsFullBodyMontagePlaying(GetMesh()->GetAnimInstance()))
+	{
+		// 풀바디 몽타주 실행중엔 움직이지 않는다
+		return;
+	}
+
 	// find out which way is forward
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -90,10 +97,11 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	// if prone, check ray trace
 	if (Value.Y > 0) // go front
 	{
+		if (!IsPathClear(GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * (StandHeight * 1.1f)))) return;
 
-		FVector ForwardVector = GetActorForwardVector();
-		FVector End = GetActorLocation() + (ForwardVector * (StandHeight + 1));
-		if (!CanProneMove(End))
+		FVector Start = GetActorLocation() + (GetActorForwardVector() * (StandHeight + 1));
+		FVector End = Start - FVector::ZAxisVector* StandHeight;
+		if (IsPathClear(Start, End))
 		{
 			ProneCommand();
 			return;
@@ -101,9 +109,11 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	}
 	else if(Value.Y < 0)// go back
 	{
-		FVector ForwardVector = GetActorForwardVector();
-		FVector End = GetActorLocation() - (ForwardVector * (StandHeight + 1));
-		if (!CanProneMove(End))
+		if (!IsPathClear(GetActorLocation(), GetActorLocation() - (GetActorForwardVector() * (StandHeight * 1.1f)))) return;
+
+		FVector Start = GetActorLocation() - (GetActorForwardVector() * (StandHeight + 1));
+		FVector End = Start - FVector::ZAxisVector * StandHeight;
+		if (IsPathClear(Start, End))
 		{
 			ProneCommand();
 			return;
@@ -112,9 +122,11 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 
 	if (Value.X > 0) // go right
 	{
-		FVector RightVector = GetActorRightVector();
-		FVector End = GetActorLocation() + (RightVector * (StandRadius + 1));
-		if (!CanProneMove(End))
+		if (!IsPathClear(GetActorLocation(), GetActorLocation() + (GetActorRightVector() * (StandRadius * 1.3f)))) return;
+
+		FVector Start = GetActorLocation() + (GetActorRightVector() * (StandRadius * 1.3f));
+		FVector End = Start - FVector::ZAxisVector * StandHeight;
+		if (IsPathClear(Start, End))
 		{
 			ProneCommand();
 			return;
@@ -122,9 +134,11 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	}
 	else if(Value.X < 0) // go left
 	{
-		FVector RightVector = GetActorRightVector();
-		FVector End = GetActorLocation() - (RightVector * (StandRadius + 1));
-		if (!CanProneMove(End))
+		if (!IsPathClear(GetActorLocation(), GetActorLocation() - (GetActorRightVector() * (StandRadius * 1.3f)))) return;
+
+		FVector Start = GetActorLocation() - (GetActorRightVector() * (StandRadius * 1.3f));
+		FVector End = Start - FVector::ZAxisVector * StandHeight;
+		if (IsPathClear(Start, End))
 		{
 			ProneCommand();
 			return;
@@ -136,10 +150,8 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	AddMovementInput(RightDirection, Value.X);
 }
 
-bool ASAPlayableCharacter::CanProneMove(FVector End)
+bool ASAPlayableCharacter::IsPathClear(FVector Start, FVector End)
 {
-	FVector Start = GetActorLocation();
-
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams = GetIgnoreCharacterParams();
 
@@ -154,7 +166,7 @@ bool ASAPlayableCharacter::CanProneMove(FVector End)
 	FColor LineColor = bHit ? FColor::Red : FColor::Green;
 	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 1.0f, 0, 1.0f);
 #endif
-	return !bHit;	// 부딪힌게 없다 -> 움직일 수 있다
+	return !bHit;	// 부딪힌게 없다 
 }
 
 

@@ -146,5 +146,5 @@ private:
 
 	void CheckInteractInterface();
 
-	bool CanProneMove(FVector End);
+	bool IsPathClear(FVector Start, FVector End);
 };
