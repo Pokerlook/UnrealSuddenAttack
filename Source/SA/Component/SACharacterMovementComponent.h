@@ -174,6 +174,11 @@ public:
 
 	/** Returns true if the character is allowed to Prone in the current state. By default it is allowed when walking or falling. */
 	virtual bool CanProneInCurrentState() const;
+
+//	virtual void PhysicsRotation(float DeltaTime) override; 
+//	virtual FRotator ComputeOrientToMovementRotation(const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation) const override;
+//	virtual void UpdateBasedRotation(FRotator& FinalRotation, const FRotator& ReducedRotation) override;
+	virtual void UpdateBasedMovement(float DeltaSeconds);
 protected:
 	float ProneLockTimestamp = -1.f;
 
@@ -186,12 +191,14 @@ protected:
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 	virtual bool ClientUpdatePositionAfterServerUpdate() override;
 
-
+	virtual bool MoveUpdatedComponentImpl(const FVector& Delta, const FQuat& NewRotation, bool bSweep, FHitResult* OutHit = NULL, ETeleportType Teleport = ETeleportType::None) override;
+	virtual void PhysWalking(float deltaTime, int32 Iterations) override;
 private:
 	void Safe_EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode);
 	void Safe_ExitSlide();
 	void PhysSlide(float deltaTime, int32 Iterations);
 	bool GetSlideSurface(FHitResult& Hit) const;
 	bool CanSlide() const;
-
+	bool ProneSweepMove(const FVector& DeltaLocation, const FQuat& DeltaRotation, FHitResult* OutHit);
+	bool TryProneMove(const FVector& DeltaLocation, const FQuat& DeltaRotation, const bool bSweep, const ETeleportType Teleport, FHitResult* OutHit);
 };

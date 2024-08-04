@@ -207,7 +207,8 @@ void ASACharacterBase::AimOffset(float DeltaTime)
         bUseControllerRotationYaw = true;
         TurnInPlace(DeltaTime);
     }
-    if (Speed > 0.f || bIsInAir) // running, or jumping
+    // running, jumping, or proning
+    if (Speed > 0.f || bIsInAir || AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("State.Stance.Prone")))) 
     {
         StartingAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
         SetYaw(0.f);

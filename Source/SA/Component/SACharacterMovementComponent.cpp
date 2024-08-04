@@ -538,6 +538,12 @@ bool USACharacterMovementComponent::CanProneInCurrentState() const
 	return (IsFalling() || IsMovingOnGround()) && UpdatedComponent && !UpdatedComponent->IsSimulatingPhysics();
 }
 
+void USACharacterMovementComponent::UpdateBasedMovement(float DeltaSeconds)
+{
+	Super::UpdateBasedMovement(DeltaSeconds);
+	UE_LOG(LogTemp, Display, TEXT("UpdateBasedMovement"));
+}
+
 void USACharacterMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
@@ -670,6 +676,259 @@ bool USACharacterMovementComponent::ClientUpdatePositionAfterServerUpdate()
 	bWantsToProne = bRealProne;
 
 	return bResult;
+}
+
+bool USACharacterMovementComponent::MoveUpdatedComponentImpl(const FVector& DeltaLocation, const FQuat& NewRotation, bool bSweep, FHitResult* OutHit, ETeleportType Teleport)
+{
+	bool SuperReturnBool = Super::MoveUpdatedComponentImpl(DeltaLocation, NewRotation, bSweep, OutHit, Teleport);
+	if (!IsProned()) return SuperReturnBool;
+	bool bMoved = false;
+	if (UpdatedComponent)
+	{
+		bMoved = TryProneMove(DeltaLocation, NewRotation, bSweep, Teleport, OutHit);
+
+		if (OutHit && OutHit->bStartPenetrating)
+		{
+			const FVector Adjustment = OutHit->Normal * (OutHit->PenetrationDepth > 0.f ? OutHit->PenetrationDepth : 0.125f) + 0.001f;
+			if (ResolvePenetrationImpl(Adjustment, *OutHit, NewRotation) && OutHit)
+			{
+				bMoved = TryProneMove(DeltaLocation, NewRotation, bSweep, Teleport, OutHit);	// here NULL Outhit call
+			}
+		}
+
+		// DrawDebugCapsuleTraceSingle(GetWorld(), Collider->GetComponentLocation(), Collider->GetComponentLocation() + DeltaLocation, Collider->GetCollisionShape().GetCapsuleRadius(), Collider->GetCollisionShape().GetCapsuleHalfHeight(), Collider->GetComponentQuat().Rotator(), EDrawDebugTrace::ForOneFrame, OutHit->bBlockingHit, *OutHit, FLinearColor::Green, FLinearColor::Red, 1.f);
+	}
+	return bMoved;
+}
+
+void USACharacterMovementComponent::PhysWalking(float deltaTime, int32 Iterations)
+{
+//	SCOPE_CYCLE_COUNTER(STAT_CharPhysWalking);
+
+	if (deltaTime < MIN_TICK_TIME)
+	{
+		return;
+	}
+
+	if (!CharacterOwner || (!CharacterOwner->Controller && !bRunPhysicsWithNoController && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() && (CharacterOwner->GetLocalRole() != ROLE_SimulatedProxy)))
+	{
+		Acceleration = FVector::ZeroVector;
+		Velocity = FVector::ZeroVector;
+		return;
+	}
+
+	if (!UpdatedComponent->IsQueryCollisionEnabled())
+	{
+		SetMovementMode(MOVE_Walking);
+		return;
+	}
+
+//	devCode(ensureMsgf(!Velocity.ContainsNaN(), TEXT("PhysWalking: Velocity contains NaN before Iteration (%s)\n%s"), *GetPathNameSafe(this), *Velocity.ToString()));
+
+	bJustTeleported = false;
+	bool bCheckedFall = false;
+	bool bTriedLedgeMove = false;
+	float remainingTime = deltaTime;
+
+	const EMovementMode StartingMovementMode = MovementMode;
+	const uint8 StartingCustomMovementMode = CustomMovementMode;
+
+	// Perform the move
+	while ((remainingTime >= MIN_TICK_TIME) && (Iterations < MaxSimulationIterations) && CharacterOwner && (CharacterOwner->Controller || bRunPhysicsWithNoController || HasAnimRootMotion() || CurrentRootMotion.HasOverrideVelocity() || (CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)))
+	{
+		Iterations++;
+		bJustTeleported = false;
+		const float timeTick = GetSimulationTimeStep(remainingTime, Iterations);
+		remainingTime -= timeTick;
+
+		// Save current values
+		UPrimitiveComponent* const OldBase = GetMovementBase();
+		const FVector PreviousBaseLocation = (OldBase != NULL) ? OldBase->GetComponentLocation() : FVector::ZeroVector;
+		const FVector OldLocation = UpdatedComponent->GetComponentLocation();
+		const FFindFloorResult OldFloor = CurrentFloor;
+
+		RestorePreAdditiveRootMotionVelocity();
+
+		// Ensure velocity is horizontal.
+		MaintainHorizontalGroundVelocity();
+		const FVector OldVelocity = Velocity;
+		Acceleration = FVector::VectorPlaneProject(Acceleration, -GetGravityDirection());
+
+		// Apply acceleration
+		if (!HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
+		{
+			CalcVelocity(timeTick, GroundFriction, false, GetMaxBrakingDeceleration());
+//			devCode(ensureMsgf(!Velocity.ContainsNaN(), TEXT("PhysWalking: Velocity contains NaN after CalcVelocity (%s)\n%s"), *GetPathNameSafe(this), *Velocity.ToString()));
+		}
+
+		ApplyRootMotionToVelocity(timeTick);
+//		devCode(ensureMsgf(!Velocity.ContainsNaN(), TEXT("PhysWalking: Velocity contains NaN after Root Motion application (%s)\n%s"), *GetPathNameSafe(this), *Velocity.ToString()));
+
+		if (MovementMode != StartingMovementMode || CustomMovementMode != StartingCustomMovementMode)
+		{
+			// Root motion could have taken us out of our current mode
+			// No movement has taken place this movement tick so we pass on full time/past iteration count
+			StartNewPhysics(remainingTime + timeTick, Iterations - 1);
+			return;
+		}
+
+		// Compute move parameters
+		const FVector MoveVelocity = Velocity;
+		const FVector Delta = timeTick * MoveVelocity;
+		const bool bZeroDelta = Delta.IsNearlyZero();
+		FStepDownResult StepDownResult;
+
+		if (bZeroDelta)
+		{
+			remainingTime = 0.f;
+		}
+		else
+		{
+			// try to move forward
+			MoveAlongFloor(MoveVelocity, timeTick, &StepDownResult);
+
+			if (IsSwimming()) //just entered water
+			{
+				StartSwimming(OldLocation, OldVelocity, timeTick, remainingTime, Iterations);
+				return;
+			}
+			else if (MovementMode != StartingMovementMode || CustomMovementMode != StartingCustomMovementMode)
+			{
+				// pawn ended up in a different mode, probably due to the step-up-and-over flow
+				// let's refund the estimated unused time (if any) and keep moving in the new mode
+				const float DesiredDist = Delta.Size();
+				if (DesiredDist > UE_KINDA_SMALL_NUMBER)
+				{
+					const float ActualDist = (UpdatedComponent->GetComponentLocation() - OldLocation).Size2D();
+					remainingTime += timeTick * (1.f - FMath::Min(1.f, ActualDist / DesiredDist));
+				}
+				StartNewPhysics(remainingTime, Iterations);
+				return;
+			}
+		}
+
+		// Update floor.
+		// StepUp might have already done it for us.
+		if (StepDownResult.bComputedFloor)
+		{
+			CurrentFloor = StepDownResult.FloorResult;
+		}
+		else
+		{
+			FindFloor(UpdatedComponent->GetComponentLocation(), CurrentFloor, bZeroDelta, NULL);
+		}
+
+		// check for ledges here
+		const bool bCheckLedges = !CanWalkOffLedges();
+		if (bCheckLedges && !CurrentFloor.IsWalkableFloor())
+		{
+			// calculate possible alternate movement
+			const FVector GravDir = GetGravityDirection();
+			const FVector NewDelta = bTriedLedgeMove ? FVector::ZeroVector : GetLedgeMove(OldLocation, Delta, GravDir);
+			if (!NewDelta.IsZero())
+			{
+				// first revert this move
+				RevertMove(OldLocation, OldBase, PreviousBaseLocation, OldFloor, false);
+
+				// avoid repeated ledge moves if the first one fails
+				bTriedLedgeMove = true;
+
+				// Try new movement direction
+				Velocity = NewDelta / timeTick;
+				remainingTime += timeTick;
+				continue;
+			}
+			else
+			{
+				// see if it is OK to jump
+				// @todo collision : only thing that can be problem is that oldbase has world collision on
+				bool bMustJump = bZeroDelta || (OldBase == NULL || (!OldBase->IsQueryCollisionEnabled() && MovementBaseUtility::IsDynamicBase(OldBase)));
+				if ((bMustJump || !bCheckedFall) && CheckFall(OldFloor, CurrentFloor.HitResult, Delta, OldLocation, remainingTime, timeTick, Iterations, bMustJump))
+				{
+					return;
+				}
+				bCheckedFall = true;
+
+				// revert this move
+				RevertMove(OldLocation, OldBase, PreviousBaseLocation, OldFloor, true);
+				remainingTime = 0.f;
+				break;
+			}
+		}
+		else
+		{
+			// Validate the floor check
+			if (CurrentFloor.IsWalkableFloor())
+			{
+				if (ShouldCatchAir(OldFloor, CurrentFloor))
+				{
+					HandleWalkingOffLedge(OldFloor.HitResult.ImpactNormal, OldFloor.HitResult.Normal, OldLocation, timeTick);
+					if (IsMovingOnGround())
+					{
+						// If still walking, then fall. If not, assume the user set a different mode they want to keep.
+						StartFalling(Iterations, remainingTime, timeTick, Delta, OldLocation);
+					}
+					return;
+				}
+
+				AdjustFloorHeight();
+				SetBase(CurrentFloor.HitResult.Component.Get(), CurrentFloor.HitResult.BoneName);
+			}
+			else if (CurrentFloor.HitResult.bStartPenetrating && remainingTime <= 0.f)
+			{
+				// The floor check failed because it started in penetration
+				// We do not want to try to move downward because the downward sweep failed, rather we'd like to try to pop out of the floor.
+				FHitResult Hit(CurrentFloor.HitResult);
+				Hit.TraceEnd = Hit.TraceStart + RotateGravityToWorld(FVector(0.f, 0.f, MAX_FLOOR_DIST));
+				const FVector RequestedAdjustment = GetPenetrationAdjustment(Hit);
+				ResolvePenetration(RequestedAdjustment, Hit, UpdatedComponent->GetComponentQuat());
+				bForceNextFloorCheck = true;
+			}
+
+			// check if just entered water
+			if (IsSwimming())
+			{
+				StartSwimming(OldLocation, Velocity, timeTick, remainingTime, Iterations);
+				return;
+			}
+
+			// See if we need to start falling.
+			if (!CurrentFloor.IsWalkableFloor() && !CurrentFloor.HitResult.bStartPenetrating)
+			{
+				const bool bMustJump = bJustTeleported || bZeroDelta || (OldBase == NULL || (!OldBase->IsQueryCollisionEnabled() && MovementBaseUtility::IsDynamicBase(OldBase)));
+				if ((bMustJump || !bCheckedFall) && CheckFall(OldFloor, CurrentFloor.HitResult, Delta, OldLocation, remainingTime, timeTick, Iterations, bMustJump))
+				{
+					return;
+				}
+				bCheckedFall = true;
+			}
+		}
+
+
+		// Allow overlap events and such to change physics state and velocity
+		if (IsMovingOnGround())
+		{
+			// Make velocity reflect actual move
+			if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity() && timeTick >= MIN_TICK_TIME)
+			{
+				// TODO-RootMotionSource: Allow this to happen during partial override Velocity, but only set allowed axes?
+				Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / timeTick;
+				MaintainHorizontalGroundVelocity();
+			}
+		}
+
+		// If we didn't move at all this iteration then abort (since future iterations will also be stuck).
+		if (UpdatedComponent->GetComponentLocation() == OldLocation)
+		{
+			remainingTime = 0.f;
+			break;
+		}
+	}
+
+	if (IsMovingOnGround())
+	{
+		MaintainHorizontalGroundVelocity();
+	}
 }
 
 void USACharacterMovementComponent::Safe_EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode)
@@ -913,4 +1172,131 @@ bool USACharacterMovementComponent::CanSlide() const
 	bool bValidSurface = GetWorld()->LineTraceTestByProfile(Start, End, ProfileName, SACharacterOwner->GetIgnoreCharacterParams());
 	bool bEnoughSpeed = Velocity.SizeSquared() > pow(MinSlideSpeed, 2);
 	return bValidSurface && bEnoughSpeed;
+}
+
+bool USACharacterMovementComponent::ProneSweepMove(const FVector& DeltaLocation, const FQuat& NewRotation, FHitResult* OutHit)
+{
+	FVector StartLocation = SACharacterOwner->GetActorLocation();
+
+	FVector EndLocation = StartLocation + DeltaLocation;
+	FQuat SweepRotation = NewRotation * FQuat(FVector(0, 1, 0), FMath::DegreesToRadians(90.f));
+
+	const ACharacter* DefaultCharacter = CharacterOwner->GetClass()->GetDefaultObject<ACharacter>();
+	float CapsuleHalfHegiht = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	float CapsuleRadius = DefaultCharacter->GetCapsuleComponent()->GetUnscaledCapsuleRadius();
+	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHegiht);
+	FCollisionQueryParams QueryParams = SACharacterOwner->GetIgnoreCharacterParams();
+
+	FHitResult LocalHitResult;
+	if (OutHit == nullptr) 
+	{
+		OutHit = &LocalHitResult;
+	}
+
+	bool bHit = GetWorld()->SweepSingleByChannel(
+		*OutHit,
+		StartLocation,
+		EndLocation,
+		SweepRotation,
+		ECC_Pawn,
+		CapsuleShape,
+		QueryParams
+	);
+
+	if (bHit)
+	{
+		// Optional: Draw debug capsule to visualize the sweep
+		DrawDebugCapsule(GetWorld(), EndLocation, CapsuleHalfHegiht, CapsuleRadius, SweepRotation, FColor::Red, false, 2.0f);
+		UE_LOG(LogTemp, Warning, TEXT("SweepMove Hit: %s"), *OutHit->GetActor()->GetName());
+
+		FVector HitNormal = OutHit->ImpactNormal;
+		FVector FloorNormal = SACharacterOwner->GetActorUpVector();
+//		float DotProduct = FVector::DotProduct(HitNormal, FloorNormal);
+//		float AngleRadians = FMath::Acos(DotProduct);
+//		float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
+		float AngleDegrees = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(HitNormal, FloorNormal)));
+		if (AngleDegrees < 45.f)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		// Optional: Draw debug capsule to visualize the sweep
+		DrawDebugCapsule(GetWorld(), EndLocation, CapsuleHalfHegiht, CapsuleRadius, SweepRotation, FColor::Green, false, 2.0f);
+		UE_LOG(LogTemp, Warning, TEXT("No Hit"));
+	}
+
+	return bHit;
+}
+
+bool USACharacterMovementComponent::TryProneMove(const FVector& DeltaLocation, const FQuat& NewRotation, const bool bSweep, const ETeleportType Teleport, FHitResult* OutHit)
+{
+	if (bSweep)
+	{
+		FVector NewDeltaLocation = DeltaLocation;
+		FQuat CurrentRotation = UpdatedComponent->GetComponentQuat();
+
+		// First see if we can move with both DeltaLocation and NewRotation
+		if (!ProneSweepMove(DeltaLocation, NewRotation, OutHit))
+		{
+			// If we can't, pull back the DeltaLocation to the hit
+			NewDeltaLocation *= OutHit->Time;
+
+			// See if the NewDeltaLocation results in a valid move
+			const bool ValidDeltaLocation = ProneSweepMove(NewDeltaLocation, CurrentRotation, nullptr);
+
+			if (ValidDeltaLocation)
+			{
+				// DeltaLocation is good, so now try to apply the rotation over a set of sweeps
+				constexpr uint8 MaxRotationSweeps = 6;
+
+				FQuat StartRotation = CurrentRotation;
+				FQuat EndRotation = NewRotation;
+
+				FHitResult RotationHit;
+
+				for (int i = 0; i < MaxRotationSweeps; i++)
+				{
+					const FQuat SweepRotation = FQuat::Slerp(StartRotation, EndRotation, i * (1.f / MaxRotationSweeps));
+
+					if (!ProneSweepMove(NewDeltaLocation, SweepRotation, &RotationHit))
+					{
+						EndRotation = SweepRotation;
+					}
+					else
+					{
+						StartRotation = SweepRotation;
+					}
+				}
+
+				if (ProneSweepMove(NewDeltaLocation, StartRotation, nullptr))
+				{
+					UpdatedComponent->MoveComponent(NewDeltaLocation, StartRotation * UpdatedComponent->GetComponentQuat(), bSweep, nullptr, MoveComponentFlags, Teleport);
+					return true;
+				}
+				else
+				{
+					// If no rotation is possible then just use the valid delta location
+					UpdatedComponent->MoveComponent(NewDeltaLocation, CurrentRotation, bSweep, nullptr, MoveComponentFlags, Teleport);
+					return true;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			// Both rotation and location are valid so move
+			UpdatedComponent->MoveComponent(NewDeltaLocation, NewRotation, bSweep, nullptr, MoveComponentFlags, Teleport);
+			return true;
+		}
+	}
+	else
+	{
+		// Sweeping is disabled so just move
+		return UpdatedComponent->MoveComponent(DeltaLocation, NewRotation, bSweep, nullptr, MoveComponentFlags, Teleport);
+	}
 }

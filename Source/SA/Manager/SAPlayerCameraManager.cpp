@@ -18,15 +18,23 @@ void ASAPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTi
 	if (ASAPlayableCharacter* SACharacter = Cast<ASAPlayableCharacter>(GetOwningPlayerController()->GetPawn()))
 	{
 		USACharacterMovementComponent* SMC = SACharacter->GetSACharacterMovement();
-		FVector TargetCrouchOffset = FVector(0, 0, 
-			SMC->GetCrouchedHalfHeight() 
-			- SACharacter->GetClass()->GetDefaultObject<ACharacter>()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		FVector Offset = FMath::Lerp(FVector::ZeroVector, TargetCrouchOffset, FMath::Clamp(CrouchBlendTime / CrouchBlendDuration, 0.f, 1.f));
+		FVector TargetOffset;
+		if (SMC->IsProned())
+		{
+			TargetOffset = FVector(0, 0, SMC->PronedHalfHeight
+				- SACharacter->GetClass()->GetDefaultObject<ACharacter>()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		}
+		else
+		{
+			TargetOffset = FVector(0, 0, SMC->GetCrouchedHalfHeight()
+				- SACharacter->GetClass()->GetDefaultObject<ACharacter>()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		}
+		FVector Offset = FMath::Lerp(FVector::ZeroVector, TargetOffset, FMath::Clamp(CrouchBlendTime / CrouchBlendDuration, 0.f, 1.f));
 
-		if (SMC->IsCrouching())
+		if (SMC->IsCrouching() || SMC->IsProned())
 		{
 			CrouchBlendTime = FMath::Clamp(CrouchBlendTime + DeltaTime, 0.f, CrouchBlendDuration);
-			Offset -= TargetCrouchOffset;
+			Offset -= TargetOffset;
 		}
 		else
 		{
