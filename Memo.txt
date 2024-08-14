@@ -34,7 +34,9 @@ ASAPlayableCharacter::StanceEventCallback 에서 set max speed
 move command(trigger) 함수에서 if체크로 달리는지 살금살금인지 보통인지 체크해서 해당 speed로 smooth interp.
  플레이어 컨트롤러에서. move end 바인딩, command인터페이스에 move end 함수 추가해서 거기서는 set speed 0로 하는걸로.
 
+# 게임모드 / 맵 추가할 때 #
+-> SATypes.h ENUM에 추가.
+-> 블루프린트 '/Game/Blueprint/MainMenu/WBP_CreateWidget.WBP_CreateWidget' 에 맵이랑 모드 고르는 선택지 추가. 
+ --> 콤보박스에 선택지 추가. Select 게임모드/맵 함수에 추가.
 
-# prone. chech 할 때 캐릭터 위로 트레이스 쏴서 오브젝트 있으면 리턴false
 
-메시 location 조정. 캡슐 사이즈 조정. --> 프론 박스 콜리전 만들고, 캡슐 크기 축소해서 그 안에 넣으면 박스 콜리전으로 덧씌워지나?

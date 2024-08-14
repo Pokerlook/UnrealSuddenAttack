@@ -44,3 +44,59 @@ enum class EItemState : uint8
 
 	DefaultMAX UMETA(DisplayName = "DefaultMAX")
 };
+
+UENUM(BlueprintType)
+enum class EItemCategory : uint8
+{
+	Weapon UMETA(DisplayName = "Weapon"),
+	Equipment UMETA(DisplayName = "Equipment"),
+	Accessory UMETA(DisplayName = "Accessory"),
+	Consumable UMETA(DisplayName = "Consumable"),
+
+};
+
+USTRUCT(Atomic, BlueprintType)
+struct FS_ItemStaticData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	FS_ItemStaticData() : IdentifierTag(), Name(), Description(), Icon(), RefClass(), MaxStackSize(1)
+	{}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		FGameplayTag IdentifierTag;	// 이걸로 데이터베이스에서 서치.
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FText Name;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		FText Description;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		UTexture2D* Icon;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+		TSubclassOf<class ASAItemBase> RefClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int MaxStackSize;
+};
+
+UENUM(BlueprintType)
+enum class EGameMode : uint8
+{
+	FreeForAll UMETA(DisplayName = "FreeForAll"),
+	TeamMatch UMETA(DisplayName = "TeamMatch"),
+	CaptureFlag UMETA(DisplayName = "CaptureFlag"),
+	Bomb UMETA(DisplayName = "Bomb"),
+	HostageRescue UMETA(DisplayName = "HostageRescue"),
+
+};
+
+UENUM(BlueprintType)
+enum class EGameMap : uint8
+{
+	Map1 UMETA(DisplayName = "Map1"),
+	Map2 UMETA(DisplayName = "Map2"),
+
+};
+

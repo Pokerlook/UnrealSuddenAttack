@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "SA/SATypes.h"
 #include "SAGameInstance.generated.h"
 
 /**
@@ -17,4 +18,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UDataTable* ItemDT;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EGameMode SelectedGameMode = EGameMode::FreeForAll;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EGameMap SelectedGameMap = EGameMap::Map1;
 };

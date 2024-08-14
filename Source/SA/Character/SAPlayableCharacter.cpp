@@ -77,18 +77,14 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 
 	// check is go front or not. check is sneek, walk, or sprint. change max speed.
 
-
-	AddMovementInput(ForwardDirection, Value.Y);
-	AddMovementInput(RightDirection, Value.X);
-
-/*	if (!bIsProned)
+	if (!bIsProned)
 	{
 		// add movement 
 		AddMovementInput(ForwardDirection, Value.Y);
 		AddMovementInput(RightDirection, Value.X);
 		return;
 	}
-
+	/*
 	const FSAGameplayTags& GameplayTags = FSAGameplayTags::Get();
 	FGameplayTagContainer OwingTags;
 	AbilitySystemComponent->GetOwnedGameplayTags(OwingTags);
@@ -96,13 +92,13 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	{
 		UE_LOG(LogTemp, Error, TEXT("bIsProne is True, but no State_Stance_Prone tag"));
 		return;
-	}
+	}*/
 
 	// if prone, check ray trace
 	if (Value.Y > 0) // go front
 	{
-		if (!IsPathClear(GetActorLocation()+FVector(0.f,0.f,SACharacterMovementComponent->PronedHalfHeight), 
-			GetActorLocation()+FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) + (GetActorForwardVector() * (StandHeight * 1.1f)))) return;
+//		if (!IsPathClear(GetActorLocation()+FVector(0.f,0.f,SACharacterMovementComponent->PronedHalfHeight), 
+//			GetActorLocation()+FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) + (GetActorForwardVector() * (StandHeight * 1.1f)))) return;
 
 		FVector Start = GetActorLocation() + (GetActorForwardVector() * (StandHeight + 1));
 		FVector End = Start - FVector::ZAxisVector* StandHeight;
@@ -114,8 +110,8 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	}
 	else if(Value.Y < 0)// go back
 	{
-		if (!IsPathClear(GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight), 
-			GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) - (GetActorForwardVector() * (StandHeight * 1.1f)))) return;
+//		if (!IsPathClear(GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight), 
+//			GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) - (GetActorForwardVector() * (StandHeight * 1.1f)))) return;
 
 		FVector Start = GetActorLocation() - (GetActorForwardVector() * (StandHeight + 1));
 		FVector End = Start - FVector::ZAxisVector * StandHeight;
@@ -128,8 +124,8 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 
 	if (Value.X > 0) // go right
 	{
-		if (!IsPathClear(GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight), 
-			GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) + (GetActorRightVector() * (StandRadius * 1.3f)))) return;
+//		if (!IsPathClear(GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight), 
+//			GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) + (GetActorRightVector() * (StandRadius * 1.3f)))) return;
 
 		FVector Start = GetActorLocation() + (GetActorRightVector() * (StandRadius * 1.3f));
 		FVector End = Start - FVector::ZAxisVector * StandHeight;
@@ -141,8 +137,8 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 	}
 	else if(Value.X < 0) // go left
 	{
-		if (!IsPathClear(GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight), 
-			GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) - (GetActorRightVector() * (StandRadius * 1.3f)))) return;
+//		if (!IsPathClear(GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight), 
+//			GetActorLocation() + FVector(0.f, 0.f, SACharacterMovementComponent->PronedHalfHeight) - (GetActorRightVector() * (StandRadius * 1.3f)))) return;
 
 		FVector Start = GetActorLocation() - (GetActorRightVector() * (StandRadius * 1.3f));
 		FVector End = Start - FVector::ZAxisVector * StandHeight;
@@ -155,7 +151,7 @@ void ASAPlayableCharacter::MoveCommand(FVector2D Value)
 
 	// add movement 
 	AddMovementInput(ForwardDirection, Value.Y);
-	AddMovementInput(RightDirection, Value.X); */
+	AddMovementInput(RightDirection, Value.X); 
 }
 
 bool ASAPlayableCharacter::IsPathClear(FVector Start, FVector End)
@@ -180,9 +176,9 @@ bool ASAPlayableCharacter::IsPathClear(FVector Start, FVector End)
 
 void ASAPlayableCharacter::LookCommand(FVector2D Value)
 {
-	AddControllerYawInput(Value.X);
-	AddControllerPitchInput(-Value.Y);
-/*	if (!bIsProned)
+//	AddControllerYawInput(Value.X);
+//	AddControllerPitchInput(-Value.Y);
+	if (!bIsProned)
 	{
 		AddControllerYawInput(Value.X);
 		AddControllerPitchInput(-Value.Y);
@@ -240,8 +236,6 @@ void ASAPlayableCharacter::LookCommand(FVector2D Value)
 	{
 		AddControllerYawInput(Value.X);
 	}
-	AddControllerPitchInput(-Value.Y);*/
-	AddControllerYawInput(Value.X);
 	AddControllerPitchInput(-Value.Y);
 }
 
